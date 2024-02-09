@@ -6,7 +6,7 @@ __Abstract__: Rolling out an observability solution is not a straightforward pro
 
 __Schedule__: https://kccnceu2024.sched.com/event/1YePAr
 
-__Slides__: 
+__Slides__: https://docs.google.com/presentation/d/1IdQgrDKp4cP6fJ_IHlv1QszRMGL_uquW/edit#slide=id.p2
 
 __Recording__: 
 
