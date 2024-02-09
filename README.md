@@ -12,4 +12,6 @@ __Recording__:
 
 ## Agenda
 
+Internal meeting doc: https://docs.google.com/document/d/1rbc0JqMP7i4koKpxqb9gYovmAlJ_BRN1Ttg3EhY9cbY/edit
+
 TBD
