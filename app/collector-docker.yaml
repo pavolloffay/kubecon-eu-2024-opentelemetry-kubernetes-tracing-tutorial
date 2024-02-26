@@ -1,4 +1,4 @@
-# docker run --rm -it --name=otelcol -p 4317:4317 -v ./app:/tmp ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector:0.88.0 --config /tmp/collector-docker.yaml
+# docker run --rm -it --name=otelcol -p 4317:4317 -v ./app:/tmp ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector:0.94.0 --config /tmp/collector-docker.yaml
 receivers:
   otlp:
     protocols:

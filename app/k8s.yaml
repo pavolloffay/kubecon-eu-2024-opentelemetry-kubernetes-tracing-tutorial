@@ -26,7 +26,7 @@ spec:
     spec:
       containers:
       - name: backend1
-        image: ghcr.io/pavolloffay/kubecon-na-2023-opentelemetry-kubernetes-metrics-tutorial-backend1:latest
+        image: ghcr.io/pavolloffay/kubecon-eu-2024-opentelemetry-kubernetes-tracing-tutorial-backend1:latest
         ports:
         - containerPort: 5000
           name: service
@@ -69,7 +69,7 @@ spec:
     spec:
       containers:
       - name: backend2
-        image: ghcr.io/pavolloffay/kubecon-na-2023-opentelemetry-kubernetes-metrics-tutorial-backend2:latest
+        image: ghcr.io/pavolloffay/kubecon-eu-2024-opentelemetry-kubernetes-tracing-tutorial-backend2:latest
         ports:
         - containerPort: 5165
 ---
@@ -111,7 +111,7 @@ spec:
     spec:
       containers:
       - name: frontend
-        image: ghcr.io/pavolloffay/kubecon-na-2023-opentelemetry-kubernetes-metrics-tutorial-frontend:latest
+        image: ghcr.io/pavolloffay/kubecon-eu-2024-opentelemetry-kubernetes-tracing-tutorial-frontend:latest
         env:
           - name: OTEL_INSTRUMENTATION_ENABLED
             value: "true"
@@ -158,7 +158,7 @@ spec:
     spec:
       containers:
       - name: frontend
-        image: ghcr.io/pavolloffay/kubecon-na-2023-opentelemetry-kubernetes-metrics-tutorial-loadgen:latest
+        image: ghcr.io/pavolloffay/kubecon-eu-2024-opentelemetry-kubernetes-tracing-tutorial-loadgen:latest
         env:
           - name: URL
             value: "http://frontend-service:4000/"
