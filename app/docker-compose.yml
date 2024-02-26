@@ -1,0 +1,30 @@
+version: "3.9"
+services:
+  frontend:
+    build: ./frontend
+    ports:
+      - "4000:4000"
+    environment:
+      OTEL_INSTRUMENTATION_ENABLED: ${OTEL_INSTRUMENTATION_ENABLED:-false}
+      BACKEND1_URL: http://backend1:5000/rolldice
+      BACKEND2_URL: http://backend2:5165/rolldice
+    depends_on:
+      - backend1
+      - backend2
+  backend1:
+    build: ./backend1
+    ports:
+      - "5000:5000"
+    environment:
+      OTEL_INSTRUMENTATION_ENABLED: ${OTEL_INSTRUMENTATION_ENABLED:-false}
+  backend2:
+    build: ./backend2
+    ports:
+      - "5165:5165"
+    environment:
+      OTEL_INSTRUMENTATION_ENABLED: ${OTEL_INSTRUMENTATION_ENABLED:-false}
+  loadgen:
+    build: ./loadgen
+    scale: 2
+    depends_on:
+      - frontend
