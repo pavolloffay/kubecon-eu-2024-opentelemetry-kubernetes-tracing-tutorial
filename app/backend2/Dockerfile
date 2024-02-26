@@ -14,7 +14,7 @@ ADD https://github.com/open-telemetry/opentelemetry-java-instrumentation/release
 
 COPY run.sh .
 
-CMD ["./run.sh"]
+ENTRYPOINT ["./run.sh"]
 
 # For debug purpose:
 # Comment the CMD above and uncomment the lines below to add the OTel java agent 
