@@ -14,4 +14,9 @@ __Recording__:
 
 Internal meeting doc: https://docs.google.com/document/d/1rbc0JqMP7i4koKpxqb9gYovmAlJ_BRN1Ttg3EhY9cbY/edit
 
-TBD
+Each tutorial step is located in a separate file:
+
+1. [Welcome & Introduction to tracing](01-welcome-intro-to-tracing.md) (Pavol & Matej, 15 min)
+1. [Auto-instrumentation](02-auto-instrumentation.md) (Pavol & Anthony, 20 min)
+1. [Manual-instrumentation](03-manual-instrumentation.md) (Bene & Matej, 10 min)
+1. Wrap up & Questions
