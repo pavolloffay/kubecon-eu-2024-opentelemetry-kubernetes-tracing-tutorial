@@ -1,0 +1,411 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: observability-backend
+---
+apiVersion: v1
+data:
+  prometheus.yml: |-
+    global:
+      scrape_interval: 15s
+      evaluation_interval: 15s
+    alerting:
+      alertmanagers:
+        - static_configs:
+            - targets:
+              # - alertmanager:9093
+    rule_files:
+      # - "first_rules.yml"
+      # - "second_rules.yml"
+    scrape_configs:
+      - job_name: "prometheus"
+        static_configs:
+          - targets: ["localhost:9090"]
+kind: ConfigMap
+metadata:
+  labels:
+    name: prometheus
+  name: prometheus-conf
+  namespace: observability-backend
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    name: prometheus
+  name: prometheus
+  namespace: observability-backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: prometheus
+      name: prometheus
+  template:
+    metadata:
+      labels:
+        app: prometheus
+        name: prometheus
+    spec:
+      containers:
+        - args:
+            - --config.file=/etc/prometheus/prometheus.yml
+            - --storage.tsdb.path=/tmp/prometheus/metrics
+            - --web.enable-remote-write-receiver
+            - --enable-feature=otlp-write-receiver
+            - --enable-feature=exemplar-storage
+          image: quay.io/prometheus/prometheus:v2.47.2
+          imagePullPolicy: IfNotPresent
+          name: prometheus
+          ports:
+            - containerPort: 9090
+          volumeMounts:
+            - mountPath: /etc/prometheus/
+              name: prometheus-config-volume
+            - mountPath: /prometheus/
+              name: prometheus-storage-volume
+      volumes:
+        - configMap:
+            defaultMode: 420
+            name: prometheus-conf
+          name: prometheus-config-volume
+        - name: prometheus-storage-volume
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    name: prometheus
+  name: prometheus
+  namespace: observability-backend
+spec:
+  ports:
+    - name: prometheus-http-metrics
+      port: 80
+      targetPort: 9090
+  selector:
+    app: prometheus
+    name: prometheus
+---
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  creationTimestamp: null
+  labels:
+    app: jaeger
+    app.kubernetes.io/component: service-account
+    app.kubernetes.io/instance: jaeger
+    app.kubernetes.io/managed-by: jaeger-operator
+    app.kubernetes.io/name: jaeger
+    app.kubernetes.io/part-of: jaeger
+  name: jaeger
+  namespace: observability-backend
+---
+apiVersion: v1
+data:
+  sampling: '{"default_strategy":{"param":1,"type":"probabilistic"}}'
+kind: ConfigMap
+metadata:
+  creationTimestamp: null
+  labels:
+    app: jaeger
+    app.kubernetes.io/component: sampling-configuration
+    app.kubernetes.io/instance: jaeger
+    app.kubernetes.io/managed-by: jaeger-operator
+    app.kubernetes.io/name: jaeger-sampling-configuration
+    app.kubernetes.io/part-of: jaeger
+  name: jaeger-sampling-configuration
+  namespace: observability-backend
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    prometheus.io/scrape: "false"
+    service.beta.openshift.io/serving-cert-secret-name: jaeger-collector-headless-tls
+  creationTimestamp: null
+  labels:
+    app: jaeger
+    app.kubernetes.io/component: service-collector
+    app.kubernetes.io/instance: jaeger
+    app.kubernetes.io/managed-by: jaeger-operator
+    app.kubernetes.io/name: jaeger-collector
+    app.kubernetes.io/part-of: jaeger
+  name: jaeger-collector-headless
+  namespace: observability-backend
+spec:
+  clusterIP: None
+  ports:
+    - name: http-zipkin
+      port: 9411
+      targetPort: 0
+    - name: grpc-jaeger
+      port: 14250
+      targetPort: 0
+    - name: http-c-tchan-trft
+      port: 14267
+      targetPort: 0
+    - name: http-c-binary-trft
+      port: 14268
+      targetPort: 0
+    - name: admin-http
+      port: 14269
+      targetPort: 0
+    - name: grpc-otlp
+      port: 4317
+      targetPort: 0
+    - name: http-otlp
+      port: 4318
+      targetPort: 0
+  selector:
+    app: jaeger
+    app.kubernetes.io/component: all-in-one
+    app.kubernetes.io/instance: jaeger
+    app.kubernetes.io/managed-by: jaeger-operator
+    app.kubernetes.io/name: jaeger
+    app.kubernetes.io/part-of: jaeger
+status:
+  loadBalancer: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    app: jaeger
+    app.kubernetes.io/component: service-collector
+    app.kubernetes.io/instance: jaeger
+    app.kubernetes.io/managed-by: jaeger-operator
+    app.kubernetes.io/name: jaeger-collector
+    app.kubernetes.io/part-of: jaeger
+  name: jaeger-collector
+  namespace: observability-backend
+spec:
+  ports:
+    - name: http-zipkin
+      port: 9411
+      targetPort: 0
+    - name: grpc-jaeger
+      port: 14250
+      targetPort: 0
+    - name: http-c-tchan-trft
+      port: 14267
+      targetPort: 0
+    - name: http-c-binary-trft
+      port: 14268
+      targetPort: 0
+    - name: admin-http
+      port: 14269
+      targetPort: 0
+    - name: grpc-otlp
+      port: 4317
+      targetPort: 0
+    - name: http-otlp
+      port: 4318
+      targetPort: 0
+  selector:
+    app: jaeger
+    app.kubernetes.io/component: all-in-one
+    app.kubernetes.io/instance: jaeger
+    app.kubernetes.io/managed-by: jaeger-operator
+    app.kubernetes.io/name: jaeger
+    app.kubernetes.io/part-of: jaeger
+  type: ClusterIP
+status:
+  loadBalancer: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    app: jaeger
+    app.kubernetes.io/component: service-query
+    app.kubernetes.io/instance: jaeger
+    app.kubernetes.io/managed-by: jaeger-operator
+    app.kubernetes.io/name: jaeger-query
+    app.kubernetes.io/part-of: jaeger
+  name: jaeger-query
+  namespace: observability-backend
+spec:
+  ports:
+    - name: http-query
+      port: 16686
+      targetPort: 16686
+    - name: grpc-query
+      port: 16685
+      targetPort: 16685
+    - name: admin-http
+      port: 16687
+      targetPort: 16687
+  selector:
+    app: jaeger
+    app.kubernetes.io/component: all-in-one
+    app.kubernetes.io/instance: jaeger
+    app.kubernetes.io/managed-by: jaeger-operator
+    app.kubernetes.io/name: jaeger
+    app.kubernetes.io/part-of: jaeger
+  type: ClusterIP
+status:
+  loadBalancer: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    app: jaeger
+    app.kubernetes.io/component: service-agent
+    app.kubernetes.io/instance: jaeger
+    app.kubernetes.io/managed-by: jaeger-operator
+    app.kubernetes.io/name: jaeger-agent
+    app.kubernetes.io/part-of: jaeger
+  name: jaeger-agent
+  namespace: observability-backend
+spec:
+  clusterIP: None
+  ports:
+    - name: zk-compact-trft
+      port: 5775
+      protocol: UDP
+      targetPort: 0
+    - name: http-config-rest
+      port: 5778
+      targetPort: 0
+    - name: jg-compact-trft
+      port: 6831
+      protocol: UDP
+      targetPort: 0
+    - name: jg-binary-trft
+      port: 6832
+      protocol: UDP
+      targetPort: 0
+    - name: admin-http
+      port: 14271
+      targetPort: 0
+  selector:
+    app: jaeger
+    app.kubernetes.io/component: all-in-one
+    app.kubernetes.io/instance: jaeger
+    app.kubernetes.io/managed-by: jaeger-operator
+    app.kubernetes.io/name: jaeger
+    app.kubernetes.io/part-of: jaeger
+status:
+  loadBalancer: {}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    linkerd.io/inject: disabled
+    prometheus.io/port: "14269"
+    prometheus.io/scrape: "true"
+  creationTimestamp: null
+  labels:
+    app: jaeger
+    app.kubernetes.io/component: all-in-one
+    app.kubernetes.io/instance: jaeger
+    app.kubernetes.io/managed-by: jaeger-operator
+    app.kubernetes.io/name: jaeger
+    app.kubernetes.io/part-of: jaeger
+  name: jaeger
+  namespace: observability-backend
+spec:
+  selector:
+    matchLabels:
+      app: jaeger
+      app.kubernetes.io/component: all-in-one
+      app.kubernetes.io/instance: jaeger
+      app.kubernetes.io/managed-by: jaeger-operator
+      app.kubernetes.io/name: jaeger
+      app.kubernetes.io/part-of: jaeger
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        linkerd.io/inject: disabled
+        prometheus.io/port: "14269"
+        prometheus.io/scrape: "true"
+        sidecar.istio.io/inject: "false"
+      creationTimestamp: null
+      labels:
+        app: jaeger
+        app.kubernetes.io/component: all-in-one
+        app.kubernetes.io/instance: jaeger
+        app.kubernetes.io/managed-by: jaeger-operator
+        app.kubernetes.io/name: jaeger
+        app.kubernetes.io/part-of: jaeger
+    spec:
+      containers:
+        - args:
+            - --sampling.strategies-file=/etc/jaeger/sampling/sampling.json
+          env:
+            - name: SPAN_STORAGE_TYPE
+              value: memory
+            - name: METRICS_STORAGE_TYPE
+            - name: COLLECTOR_ZIPKIN_HOST_PORT
+              value: :9411
+            - name: JAEGER_DISABLED
+              value: "false"
+            - name: COLLECTOR_OTLP_ENABLED
+              value: "true"
+          image: jaegertracing/all-in-one:1.54.0
+          livenessProbe:
+            failureThreshold: 5
+            httpGet:
+              path: /
+              port: 14269
+            initialDelaySeconds: 5
+            periodSeconds: 15
+          name: jaeger
+          ports:
+            - containerPort: 5775
+              name: zk-compact-trft
+              protocol: UDP
+            - containerPort: 5778
+              name: config-rest
+            - containerPort: 6831
+              name: jg-compact-trft
+              protocol: UDP
+            - containerPort: 6832
+              name: jg-binary-trft
+              protocol: UDP
+            - containerPort: 9411
+              name: zipkin
+            - containerPort: 14267
+              name: c-tchan-trft
+            - containerPort: 14268
+              name: c-binary-trft
+            - containerPort: 16685
+              name: grpc-query
+            - containerPort: 16686
+              name: query
+            - containerPort: 14269
+              name: admin-http
+            - containerPort: 14250
+              name: grpc
+            - containerPort: 4317
+              name: grpc-otlp
+            - containerPort: 4318
+              name: http-otlp
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 14269
+            initialDelaySeconds: 1
+          resources: {}
+          volumeMounts:
+            - mountPath: /etc/jaeger/sampling
+              name: jaeger-sampling-configuration-volume
+              readOnly: true
+      enableServiceLinks: false
+      serviceAccountName: jaeger
+      volumes:
+        - configMap:
+            items:
+              - key: sampling
+                path: sampling.json
+            name: jaeger-sampling-configuration
+          name: jaeger-sampling-configuration-volume
