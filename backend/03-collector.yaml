@@ -26,10 +26,15 @@ spec:
     exporters:
       debug:
         verbosity: detailed
+      
+      otlp:
+        endpoint: jaeger-collector:4317
+        tls:
+          insecure: true
 
     service:
       pipelines:
-        metrics:
+        traces:
           receivers: [otlp]
           processors: [batch]
-          exporters: [debug]
+          exporters: [otlp,debug]
