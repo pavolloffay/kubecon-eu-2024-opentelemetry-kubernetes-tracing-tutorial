@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 if [[ "${OTEL_INSTRUMENTATION_ENABLED}" == "true" ]] ; then
     echo 'Run with instrumentation'
