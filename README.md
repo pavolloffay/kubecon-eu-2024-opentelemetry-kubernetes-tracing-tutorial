@@ -16,7 +16,8 @@ Internal meeting doc: https://docs.google.com/document/d/1rbc0JqMP7i4koKpxqb9gYo
 
 Each tutorial step is located in a separate file:
 
-1. [Welcome & Introduction to tracing](01-welcome-tracing-intro) (Pavol & Matej, 15 min)
-1. [Auto-instrumentation](02-auto-instrumentation.md) (Pavol & Anthony, 20 min)
-1. [Manual-instrumentation](03-manual-instrumentation.md) (Bene & Matej, 10 min)
+1. [Welcome & Setup](01-welcome-setup.md) (Pavol, 5 min)
+1. [Welcome & Setup](02-tracing-introduction.md) (Matej, 10 min)
+1. [Auto-instrumentation](03-auto-instrumentation.md) (Pavol & Anthony, 20 min)
+1. [Manual-instrumentation](04-manual-instrumentation.md) (Bene & Matej, 10 min)
 1. Wrap up & Questions

@@ -37,4 +37,4 @@ sequenceDiagram
 ```
 
 ---
-[Next steps](./02-auto-instrumentation.md)
+[Next steps](./04-manual-instrumentation.md)
