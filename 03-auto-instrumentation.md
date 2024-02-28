@@ -289,6 +289,7 @@ See the [Instrumentation CR](./app/instrumentation-java-custom-config.yaml).
 ```bash
 kubectl apply -f https://raw.githubusercontent.com/pavolloffay/kubecon-eu-2024-opentelemetry-kubernetes-tracing-tutorial/main/app/instrumentation-java-custom-config.yaml
 kubectl rollout restart deployment.apps/backend2-deployment -n tutorial-application
+kubectl get pods -w -n tutorial-application
 ```
 
 ![Span from backend2-deployment](./images/jaeger-capture-custom-headers.jpg)

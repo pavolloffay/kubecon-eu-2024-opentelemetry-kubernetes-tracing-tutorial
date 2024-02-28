@@ -36,6 +36,7 @@ public class RollController {
 	}
 
     public int getRandomNumber(int min, int max) {
-        return (int) ((Math.random() * (max - min)) + min);
+        int result = (int) ((Math.random() * (max - min)) + min);
+        return result;
     }
 }
