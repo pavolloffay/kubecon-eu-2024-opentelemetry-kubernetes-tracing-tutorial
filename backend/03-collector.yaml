@@ -24,17 +24,28 @@ spec:
       batch:
 
     exporters:
-      debug:
-        verbosity: detailed
-      
-      otlp:
+      otlp/traces:
         endpoint: jaeger-collector:4317
         tls:
           insecure: true
+      
+      otlphttp/metrics:
+        endpoint: http://prometheus.observability-backend.svc.cluster.local:80/api/v1/otlp/
+        tls:
+          insecure: true
+      
+      debug:
+        verbosity: detailed
 
     service:
       pipelines:
         traces:
           receivers: [otlp]
           processors: [batch]
-          exporters: [otlp,debug]
+          exporters: [otlp/traces]
+        metrics:
+          receivers: [otlp]
+          exporters: [otlphttp/metrics]
+        logs:
+          receivers: [otlp]
+          exporters: [debug]

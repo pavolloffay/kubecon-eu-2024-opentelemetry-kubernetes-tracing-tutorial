@@ -163,6 +163,70 @@ Containers:
 
 Now let's execute some requests on the app [http://localhost:4000/](http://localhost:4000/) and see traces in the Jaeger console [http://localhost:16686/](http://localhost:16686/).
 
+In addition to traces in the Java auto-instrumentation also emits logs and metrics.
+The logs in our case are printed into the collector stdout via `debug` exporter and metrics are sent via OTLP HTTP into Prometheus.
+
+```bash
+2024-02-28T10:08:21.807Z	info	LogsExporter	{"kind": "exporter", "data_type": "logs", "name": "debug", "resource logs": 1, "log records": 7}
+2024-02-28T10:08:21.807Z	info	ResourceLog #0
+Resource SchemaURL: https://opentelemetry.io/schemas/1.21.0
+Resource attributes:
+     -> container.id: Str(462d8e356c9b801d76edab5886730965f7f37b3d8b47d5eadfaea134141a35c1)
+     -> host.arch: Str(amd64)
+     -> host.name: Str(backend2-deployment-c7c8dc78c-wvhnk)
+     -> k8s.container.name: Str(backend2)
+     -> k8s.deployment.name: Str(backend2-deployment)
+     -> k8s.namespace.name: Str(tutorial-application)
+     -> k8s.node.name: Str(minikube)
+     -> k8s.pod.name: Str(backend2-deployment-c7c8dc78c-wvhnk)
+     -> k8s.replicaset.name: Str(backend2-deployment-c7c8dc78c)
+     -> os.description: Str(Linux 6.5.12-100.fc37.x86_64)
+     -> os.type: Str(linux)
+     -> process.command_args: Slice(["/opt/java/openjdk/bin/java","-jar","./build/libs/dice-0.0.1-SNAPSHOT.jar"])
+     -> process.executable.path: Str(/opt/java/openjdk/bin/java)
+     -> process.pid: Int(7)
+     -> process.runtime.description: Str(Eclipse Adoptium OpenJDK 64-Bit Server VM 21.0.2+13-LTS)
+     -> process.runtime.name: Str(OpenJDK Runtime Environment)
+     -> process.runtime.version: Str(21.0.2+13-LTS)
+     -> service.name: Str(backend2-deployment)
+     -> service.version: Str(withspan)
+     -> telemetry.auto.version: Str(1.32.1)
+     -> telemetry.sdk.language: Str(java)
+     -> telemetry.sdk.name: Str(opentelemetry)
+     -> telemetry.sdk.version: Str(1.34.1)
+ScopeLogs #0
+ScopeLogs SchemaURL: 
+InstrumentationScope org.apache.catalina.core.ContainerBase.[Tomcat].[localhost].[/] 
+LogRecord #0
+ObservedTimestamp: 2024-02-28 10:08:21.178481174 +0000 UTC
+Timestamp: 2024-02-28 10:08:21.178 +0000 UTC
+SeverityText: INFO
+SeverityNumber: Info(9)
+Body: Str(Initializing Spring embedded WebApplicationContext)
+Trace ID: 
+Span ID: 
+Flags: 0
+ScopeLogs #1
+ScopeLogs SchemaURL: 
+InstrumentationScope io.opentelemetry.dice.DiceApplication 
+LogRecord #0
+ObservedTimestamp: 2024-02-28 10:08:21.638118261 +0000 UTC
+Timestamp: 2024-02-28 10:08:21.638 +0000 UTC
+SeverityText: INFO
+SeverityNumber: Info(9)
+Body: Str(Started DiceApplication in 2.105 seconds (process running for 4.485))
+Trace ID: 
+Span ID: 
+Flags: 0
+```
+
+```bash
+kubectl port-forward -n observability-backend service/prometheus 8080:80
+```
+Open Prometheus in the browser [localhost:8080](http://localhost:8080/graph?g0.expr=group%20(%7Bjob%3D%22backend2-deployment%22%7D)%20by%20(__name__)%0A&g0.tab=0&g0.stacked=0&g0.show_exemplars=0&g0.range_input=1h)
+
+![Metrics from Java agent from backend2-deployment](./images/prometheus_javaagent_metrics_list.jpg)
+
 ### Customize spans created by the auto-instrumentation
 
 In this section we will modify [Java backend2](./app/backend2) service to:  
