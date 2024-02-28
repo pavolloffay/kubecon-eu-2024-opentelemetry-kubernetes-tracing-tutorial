@@ -68,6 +68,12 @@ Deploy the application into the kubernetes cluster. The app will be deployed int
 ```bash
 kubectl apply -f https://raw.githubusercontent.com/pavolloffay/kubecon-eu-2024-opentelemetry-kubernetes-tracing-tutorial/main/app/k8s.yaml
 kubectl get pods -n tutorial-application -w
+...
+NAME                                   READY   STATUS    RESTARTS   AGE
+backend1-deployment-577cf945b4-tz5kv   1/1     Running   0          62s
+backend2-deployment-59d4b47774-xbq84   1/1     Running   0          62s
+frontend-deployment-678795956d-zwg4q   1/1     Running   0          62s
+loadgen-deployment-5c7d6896f8-2fz6h    1/1     Running   0          62s
 ```
 
 Now port-forward the frontend app:
@@ -82,8 +88,11 @@ Open browser at [http://localhost:4000/](http://localhost:4000/).
 
 Deploy OpenTelemetry collector that will receive data from the instrumented workloads.
 
+See the [OpenTelemetryCollector CR](./backend/03-collector.yaml).
+
 ```bash
 kubectl apply -f https://raw.githubusercontent.com/pavolloffay/kubecon-eu-2024-opentelemetry-kubernetes-tracing-tutorial/main/backend/03-collector.yaml
+kubectl get pods -n observability-backend -w
 ```
 
 ### Create instrumentation CR and see traces in the Jaeger console
