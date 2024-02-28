@@ -62,12 +62,14 @@ kind delete cluster --name=workshop
 
 ```bash
 kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.11.0/cert-manager.yaml
+kubectl get pods -n cert-manager -w 
 ```
 
 ### Deploy OpenTelemetry operator
 
 ```bash
 kubectl apply -f https://github.com/open-telemetry/opentelemetry-operator/releases/download/v0.94.0/opentelemetry-operator.yaml
+kubectl get pods -n opentelemetry-operator-system -w  
 ```
 
 ### Deploy observability backend
@@ -76,6 +78,7 @@ This course is all about Observabilty, so a backend is needed. If you don't have
 
 ```bash
 kubectl apply -f https://raw.githubusercontent.com/pavolloffay/kubecon-eu-2024-opentelemetry-kubernetes-tracing-tutorial/main/backend/01-backend.yaml
+kubectl get pods -n observability-backend -w 
 ```
 
 Afterwards, the backend can be found in the namespace `observability-backend`. 
