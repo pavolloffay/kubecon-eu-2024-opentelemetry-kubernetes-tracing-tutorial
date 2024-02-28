@@ -105,6 +105,13 @@ See the [Instrumentation CR](./app/instrumentation.yaml).
 
 ```bash
 kubectl apply -f https://raw.githubusercontent.com/pavolloffay/kubecon-eu-2024-opentelemetry-kubernetes-tracing-tutorial/main/app/instrumentation.yaml
+kubectl get pods -n tutorial-application -w
+...                                                                                                                                                                                                                                                                                        
+NAME                                   READY   STATUS    RESTARTS   AGE
+backend1-deployment-577cf945b4-tz5kv   1/1     Running   0          8m59s
+backend2-deployment-59d4b47774-xbq84   1/1     Running   0          8m59s
+frontend-deployment-678795956d-zwg4q   1/1     Running   0          8m59s
+loadgen-deployment-5c7d6896f8-2fz6h    1/1     Running   0          8m59s
 ```
 
 The `Instrumentation` CR does not instrument the workloads. The instrumentation needs to be enabled by annotating a pod:
@@ -113,6 +120,45 @@ The `Instrumentation` CR does not instrument the workloads. The instrumentation 
 kubectl patch deployment frontend-deployment -n tutorial-application -p '{"spec": {"template":{"metadata":{"annotations":{"instrumentation.opentelemetry.io/inject-sdk":"true"}}}} }'
 kubectl patch deployment backend1-deployment -n tutorial-application -p '{"spec": {"template":{"metadata":{"annotations":{"instrumentation.opentelemetry.io/inject-python":"true"}}}} }'
 kubectl patch deployment backend2-deployment -n tutorial-application -p '{"spec": {"template":{"metadata":{"annotations":{"instrumentation.opentelemetry.io/inject-java":"true"}}}} }'
+kubectl get pods -n tutorial-application -w
+...
+NAME                                   READY   STATUS              RESTARTS   AGE
+backend1-deployment-559946d88-c6zq7    0/1     Init:0/1            0          1s
+backend2-deployment-5658ddfd6d-gz6ql   0/1     Init:0/1            0          1s
+frontend-deployment-79b9c46d76-n74gr   0/1     ContainerCreating   0          1s
+```
+
+See the `backend2` pod spec:
+
+```bash
+kubectl describe pod backend2-deployment-5658ddfd6d-gz6ql -n tutorial-application
+...
+Init Containers:
+  opentelemetry-auto-instrumentation-java:
+    Image:         ghcr.io/open-telemetry/opentelemetry-operator/autoinstrumentation-java:1.32.1
+    Command:
+      cp
+      /javaagent.jar
+      /otel-auto-instrumentation-java/javaagent.jar
+    Mounts:
+      /otel-auto-instrumentation-java from opentelemetry-auto-instrumentation-java (rw)
+      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-48z6x (ro)
+Containers:
+  backend2:
+    Image:          ghcr.io/pavolloffay/kubecon-eu-2024-opentelemetry-kubernetes-tracing-tutorial-backend2:latest
+    Environment:
+      OTEL_LOGS_EXPORTER:                  otlp
+      JAVA_TOOL_OPTIONS:                    -javaagent:/otel-auto-instrumentation-java/javaagent.jar
+      OTEL_SERVICE_NAME:                   backend2-deployment
+      OTEL_EXPORTER_OTLP_ENDPOINT:         http://otel-collector.observability-backend.svc.cluster.local:4317
+      OTEL_RESOURCE_ATTRIBUTES_POD_NAME:   backend2-deployment-5658ddfd6d-gz6ql (v1:metadata.name)
+      OTEL_RESOURCE_ATTRIBUTES_NODE_NAME:   (v1:spec.nodeName)
+      OTEL_PROPAGATORS:                    tracecontext,baggage,b3
+      OTEL_TRACES_SAMPLER:                 parentbased_traceidratio
+      OTEL_TRACES_SAMPLER_ARG:             1
+      OTEL_RESOURCE_ATTRIBUTES:            k8s.container.name=backend2,k8s.deployment.name=backend2-deployment,k8s.namespace.name=tutorial-application,k8s.node.name=$(OTEL_RESOURCE_ATTRIBUTES_NODE_NAME),k8s.pod.name=$(OTEL_RESOURCE_ATTRIBUTES_POD_NAME),k8s.replicaset.name=backend2-deployment-5658ddfd6d,service.version=latest
+    Mounts:
+      /otel-auto-instrumentation-java from opentelemetry-auto-instrumentation-java (rw)
 ```
 
 Now let's execute some requests on the app [http://localhost:4000/](http://localhost:4000/) and see traces in the Jaeger console [http://localhost:16686/](http://localhost:16686/).
@@ -128,26 +174,38 @@ The OpenTelemetry Java auto-instrumentation supports `@WithSpan`, `@SpanAttribut
 Open the [RollController.java](./app/backend2/src/main/java/io/opentelemetry/dice/RollController.java) and use the annotations:
 
 ```java
+# app/backend2/build.gradle
+#   implementation 'io.opentelemetry.instrumentation:opentelemetry-instrumentation-annotations:2.1.0'
+#   implementation 'io.opentelemetry:opentelemetry-api:1.35.0'
+ 
+    import io.opentelemetry.api.trace.Span;
+    import io.opentelemetry.instrumentation.annotations.WithSpan;
+    import io.opentelemetry.instrumentation.annotations.SpanAttribute;
+    import io.opentelemetry.instrumentation.annotations.AddingSpanAttributes;
+
     @AddingSpanAttributes
 	@GetMapping("/rolldice")
 	public String index(@SpanAttribute("player") @RequestParam("player") Optional<String> player) {
-
+    
     @WithSpan
     public int getRandomNumber(@SpanAttribute("min") int min, @SpanAttribute("max") int max) {
-        return (int) ((Math.random() * (max - min)) + min);
+        int result = (int) ((Math.random() * (max - min)) + min);
+        Span span = Span.current();
+        span.setAttribute("result", result);
+        return result;
     }
 ```
 
 Compile it and deploy:
 ```bash
-cd /app/backend2
+cd app/backend2
 
 # Use minikube's docker registry
-eval $(minikube -p minikube docker-env)
-docker build -t pavolloffay/tutorial-backend2:withspan .
-# docker push pavolloffay/tutorial-backend2:withspan
+# eval $(minikube -p minikube docker-env)
+docker build -t ghcr.io/pavolloffay/kubecon-eu-2024-opentelemetry-kubernetes-tracing-tutorial-backend2:withspan . 
+# docker push ghcr.io/pavolloffay/kubecon-eu-2024-opentelemetry-kubernetes-tracing-tutorial-backend2:withspan
 
-kubectl set image deployment.apps/backend2-deployment backend2=pavolloffay/tutorial-backend2:withspan -n tutorial-application
+kubectl set image deployment.apps/backend2-deployment backend2=ghcr.io/pavolloffay/kubecon-eu-2024-opentelemetry-kubernetes-tracing-tutorial-backend2:withspan -n tutorial-application
 kubectl get pods -w -n tutorial-application
 ```
 
@@ -158,6 +216,8 @@ kubectl get pods -w -n tutorial-application
 In this section we will configure the Java auto-instrumentation by modifying `Instrumentation` CR to:
 * create custom spans - for the main method of the application
 * capture server response HTTP headers
+
+See the [Instrumentation CR](./app/instrumentation-java-custom-config.yaml).
 
 ```bash
 kubectl apply -f https://raw.githubusercontent.com/pavolloffay/kubecon-eu-2024-opentelemetry-kubernetes-tracing-tutorial/main/app/instrumentation-java-custom-config.yaml

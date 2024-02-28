@@ -9,6 +9,10 @@ import org.apache.logging.log4j.Logger;
 
 import java.util.Optional;
 
+// import io.opentelemetry.api.trace.Span;
+// import io.opentelemetry.instrumentation.annotations.WithSpan;
+// import io.opentelemetry.instrumentation.annotations.SpanAttribute;
+// import io.opentelemetry.instrumentation.annotations.AddingSpanAttributes;
 
 @RestController
 public class RollController {
