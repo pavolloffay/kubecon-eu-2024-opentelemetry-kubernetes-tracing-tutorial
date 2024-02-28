@@ -163,6 +163,9 @@ Containers:
 
 Now let's execute some requests on the app [http://localhost:4000/](http://localhost:4000/) and see traces in the Jaeger console [http://localhost:16686/](http://localhost:16686/).
 
+![Trace search](./images/jaeger-trace-search.jpg)
+![Trace detail](./images/jaeger-trace-detail.jpg)
+
 In addition to traces in the Java auto-instrumentation also emits logs and metrics.
 The logs in our case are printed into the collector stdout via `debug` exporter and metrics are sent via OTLP HTTP into Prometheus.
 
