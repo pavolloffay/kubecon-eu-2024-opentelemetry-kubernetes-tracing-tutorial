@@ -170,6 +170,7 @@ Now let's execute some requests on the app [http://localhost:4000/](http://local
 
 In addition to traces in the Java auto-instrumentation also emits logs and metrics.
 The logs in our case are printed into the collector stdout via `debug` exporter and metrics are sent via OTLP HTTP into Prometheus.
+The OpenTelemetry spec defines that the following metrics should be collected: [HTTP metrics](https://opentelemetry.io/docs/specs/semconv/http/http-metrics/).
 
 ```bash
 2024-02-28T10:08:21.807Z	info	LogsExporter	{"kind": "exporter", "data_type": "logs", "name": "debug", "resource logs": 1, "log records": 7}
