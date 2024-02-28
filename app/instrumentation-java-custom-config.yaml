@@ -26,8 +26,6 @@ spec:
     env:
       - name: OTEL_INSTRUMENTATION_METHODS_INCLUDE
         value: io.opentelemetry.dice.DiceApplication[main];
-      - name: OTEL_INSTRUMENTATION_METHODS_INCLUDE
-        value: io.opentelemetry.dice.DiceApplication[main];
       - name: OTEL_INSTRUMENTATION_HTTP_SERVER_CAPTURE_RESPONSE_HEADERS
         value: Content-Type,Date
 #      - name: OTEL_INSTRUMENTATION_TOMCAT_ENABLED
