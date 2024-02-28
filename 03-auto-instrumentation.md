@@ -1,5 +1,7 @@
 # Auto-instrumentation
 
+<!---  Recording https://vimeo.com/917479681/f57ec76c52   -->
+
 ## Application Description
 
 The sample application is a simple _"dice game"_, where two players roll a
