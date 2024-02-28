@@ -287,6 +287,8 @@ In this section we will configure the Java auto-instrumentation by modifying `In
 * create custom spans - for the main method of the application
 * capture server response HTTP headers
 
+See the [Java agent docs](https://opentelemetry.io/docs/languages/java/automatic/configuration/) with all the configuration options.
+
 See the [Instrumentation CR](./app/instrumentation-java-custom-config.yaml).
 
 ```bash
