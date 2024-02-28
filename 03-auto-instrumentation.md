@@ -101,6 +101,8 @@ Now let's instrument the app with the `Instrumentation` CR and see traces in the
 
 First the Instrumentation CR needs to be created in the `tutorial-application` namespace:
 
+See the [Instrumentation CR](./app/instrumentation.yaml).
+
 ```bash
 kubectl apply -f https://raw.githubusercontent.com/pavolloffay/kubecon-eu-2024-opentelemetry-kubernetes-tracing-tutorial/main/app/instrumentation.yaml
 ```
