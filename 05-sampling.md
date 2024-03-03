@@ -40,9 +40,11 @@ To get a better feel for the cost, you may want to play with some SaaS cost calc
 - TODO
 - TODO
 
+For more details, check the [offical documentation](https://opentelemetry.io/docs/concepts/sampling/).
+
 ### How can we now reduce the number of traces?
 
-![OpenTelemetry Sampling](images/sampling-concept.png)
+![OpenTelemetry Sampling](images/sampling-venn.svg)
 
 ### Comparing Sampling Approaches
 
