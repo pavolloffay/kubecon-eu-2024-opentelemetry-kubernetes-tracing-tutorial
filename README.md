@@ -20,4 +20,6 @@ Each tutorial step is located in a separate file:
 1. [OpenTelemetry distributed tracing introduction](02-tracing-introduction.md) (Matej, 10 min)
 1. [Auto-instrumentation](03-auto-instrumentation.md) (Pavol & Anthony, 20 min)
 1. [Manual-instrumentation](04-manual-instrumentation.md) (Bene & Matej, 10 min)
+1. [Sampling](05-sampling.md) (Bene & Anu, 15 min)
+1. [Metrics from Traces](06-RED-metrics.md) (Anthony, 10 min)
 1. Wrap up & Questions
