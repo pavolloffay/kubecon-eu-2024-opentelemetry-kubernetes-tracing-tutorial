@@ -210,8 +210,8 @@ Timestamp: 2024-02-28 10:08:21.178 +0000 UTC
 SeverityText: INFO
 SeverityNumber: Info(9)
 Body: Str(Initializing Spring embedded WebApplicationContext)
-Trace ID: 
-Span ID: 
+Trace ID: 3bde5d3ee82303571bba6e1136781fe4 
+Span ID: 45de5d3ee82303571bba6e1136781fe4
 Flags: 0
 ScopeLogs #1
 ScopeLogs SchemaURL: 
@@ -222,8 +222,8 @@ Timestamp: 2024-02-28 10:08:21.638 +0000 UTC
 SeverityText: INFO
 SeverityNumber: Info(9)
 Body: Str(Started DiceApplication in 2.105 seconds (process running for 4.485))
-Trace ID: 
-Span ID: 
+Trace ID: 3bde5d3ee82303571bba6e1136781fe4
+Span ID: 46de5d3ee82303571bba6e1136781fe4
 Flags: 0
 ```
 
