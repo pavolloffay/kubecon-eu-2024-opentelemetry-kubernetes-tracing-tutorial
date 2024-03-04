@@ -38,31 +38,6 @@ sequenceDiagram
     frontend-->>loadgen: alice wins
 ```
 
-## Manual or Automatic Instrumentation?
-
-To make your application emit traces, metrics & logs you can either instrument
-your application _manually_ or _automatically_:
-
-- Manual instrumentation means that you modify your code yourself: you initialize and
-  configure the SDK, you load instrumentation libraries, you create your own spans,
-  metrics using the API.
-  Developers can use this approach to tune the observability of their application to
-  their needs, but it requires a lot of initial time investment, expertise how (RPC) frameworks and client work and maintenance over time.
-- Automatic instrumentation means that you don't have to touch your code to get your
-  application emit telemetry data.
-  Automatic instrumentation is great to get you started with OpenTelemetry, and it is
-  also valuable for Application Operators, who have no access or insights about the
-  source code.
-
-In this chapter we will cover using OpenTelemetry auto-instrumentation.
-
-
-## Instrument the demo application
-
-In this section we will deploy the app into Kubernetes and instrument it with OpenTelemetry auto-instrumentation
-using the [Instrumentation CRD](https://github.com/open-telemetry/opentelemetry-operator?tab=readme-ov-file#opentelemetry-auto-instrumentation-injection) provided by the OpenTelemetry operator.
-Then we will modify the app to create custom spans and collector additional attributes.
-
 ### Deploy the app into Kubernetes
 
 Deploy the application into the kubernetes cluster. The app will be deployed into `tutorial-application` namespace.
@@ -86,7 +61,33 @@ kubectl port-forward service/frontend-service -n tutorial-application 4000:4000
 
 Open browser at [http://localhost:4000/](http://localhost:4000/).
 
+## Manual or Automatic Instrumentation?
+
+To make your application emit traces, metrics & logs you can either instrument
+your application _manually_ or _automatically_:
+
+- Manual instrumentation means that you modify your code yourself: you initialize and
+  configure the SDK, you load instrumentation libraries, you create your own spans,
+  metrics using the API.
+  Developers can use this approach to tune the observability of their application to
+  their needs, but it requires a lot of initial time investment, expertise how (RPC) frameworks and client work and maintenance over time.
+- Automatic instrumentation means that you don't have to touch your code to get your
+  application emit telemetry data.
+  Automatic instrumentation is great to get you started with OpenTelemetry, and it is
+  also valuable for Application Operators, who have no access or insights about the
+  source code.
+
+In this chapter we will cover using OpenTelemetry auto-instrumentation.
+
+## Instrument the demo application
+
+In this section we will deploy the app into Kubernetes and instrument it with OpenTelemetry auto-instrumentation
+using the [Instrumentation CRD](https://github.com/open-telemetry/opentelemetry-operator?tab=readme-ov-file#opentelemetry-auto-instrumentation-injection) provided by the OpenTelemetry operator.
+Then we will modify the app to create custom spans and collector additional attributes.
+
 ### Deploy OpenTelemetry collector
+
+![OpenTelemetry Collector](images/otel-collector.png)
 
 Deploy OpenTelemetry collector that will receive data from the instrumented workloads.
 
