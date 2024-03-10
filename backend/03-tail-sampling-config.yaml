@@ -30,7 +30,7 @@ spec:
         policies:
           - name: keep-errors
             type: status_code
-            status_code: {status_codes: [ERROR, UNSET]}
+            status_code: {status_codes: [ERROR]}
           - name: keep-slow-traces
             type: latency
             latency: {threshold_ms: 500}
