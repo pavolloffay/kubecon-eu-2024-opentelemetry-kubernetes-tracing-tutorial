@@ -64,9 +64,9 @@ https://opentelemetry.io/docs/languages/sdk-configuration/general/#otel_traces_s
 
 Tail sampling is where the decision to sample a trace takes place by considering all or most of the spans within the trace. Tail Sampling gives you the option to sample your traces based on specific criteria derived from different parts of a trace, which isn’t an option with Head Sampling.
 
-Usecase: Sample 100% of the traces that have an error-ing span in them.
-
 ```yaml
+  # Samples spans with status codes ERROR (OK spans dropped) and 
+  # traces which have a duration longer than 500ms.
   processors: 
     tail_sampling:
       decision_wait: 10s # time to wait before making a sampling decision is made
