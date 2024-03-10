@@ -64,6 +64,13 @@ https://opentelemetry.io/docs/languages/sdk-configuration/general/#otel_traces_s
 
 Tail sampling is where the decision to sample a trace takes place by considering all or most of the spans within the trace. Tail Sampling gives you the option to sample your traces based on specific criteria derived from different parts of a trace, which isn’t an option with Head Sampling.
 
+Deploy the opentelemetry collector with `tail_sampling` enabled.
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/pavolloffay/kubecon-eu-2024-opentelemetry-kubernetes-tracing-tutorial/backend/03-tail-sampling-config.yaml
+kubectl get pods -n observability-backend -w
+```
+
 ```yaml
   # Sample 100% of traces with ERROR-ing spans (omit traces with all OK spans)
   # and traces which have a duration longer than 500ms
@@ -87,11 +94,12 @@ Tail sampling is where the decision to sample a trace takes place by considering
         ]
 ```
 
-Applying this chart will start a new collector with the tailsampling processor
+Backend 1 generates random errors for player 'bene', while Backend 2 introduces random delays for player 'anusha'.
 
-```shell
-kubectl apply -f https://raw.githubusercontent.com/pavolloffay/kubecon-eu-2024-opentelemetry-kubernetes-tracing-tutorial/backend/03-tail-sampling-config.yaml
-```
+Now let's execute some requests on the app [http://localhost:4000/?player1=bene&player2=anusha](http://localhost:4000/) and see traces in the Jaeger console [http://localhost:16686/](http://localhost:16686/).
+
+<TODO: Add screenshot>
+
 
 -----
 ### Advanced Topic: Sampling at scale with OpenTelemetry
