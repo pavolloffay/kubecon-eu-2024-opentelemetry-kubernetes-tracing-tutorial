@@ -41,7 +41,16 @@ func main() {
 	if !ok {
 		v = "0"
 	}
-	rate, err := strconv.Atoi(v)
+	rateError, err := strconv.Atoi(v)
+	if err != nil {
+		panic(err)
+	}
+
+	v, ok = os.LookupEnv("RATE_HIGH_DELAY")
+	if !ok {
+		v = "0"
+	}
+	rateDelay, err := strconv.Atoi(v)
 	if err != nil {
 		panic(err)
 	}
@@ -59,10 +68,11 @@ func main() {
 			max = 6
 		}
 		result := doRoll(r.Context(), max)
-		if err := causeError(r.Context(), rate); err != nil {
+		if err := causeError(r.Context(), rateError); err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
+		causeDelay(r.Context(), rateDelay)
 		resStr := strconv.Itoa(result)
 		rollCounter.Inc()
 		numbersCounter.WithLabelValues(resStr).Inc()
@@ -90,10 +100,13 @@ func causeError(_ context.Context, rate int) error {
 	return nil
 }
 
-func doRoll(_ context.Context, max int) int {
-	result := rand.Intn(max) + 1
-	if result > 6 {
-		time.Sleep(time.Duration(0.5*float64(result)) * time.Second)
+func causeDelay(_ context.Context, rate int) {
+	randomNumber := rand.Intn(100)
+	if randomNumber < rate {
+		time.Sleep(time.Duration(2+rand.Intn(3)) * time.Second)
 	}
-	return result
+}
+
+func doRoll(_ context.Context, max int) int {
+	return rand.Intn(max) + 1
 }
