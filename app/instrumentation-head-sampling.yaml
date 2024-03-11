@@ -24,5 +24,11 @@ spec:
         value: http://otel-collector.observability-backend.svc.cluster.local:4318
   java:
     env:
-      - name: OTEL_LOGS_EXPORTER
-        value: otlp
+      - name: OTEL_INSTRUMENTATION_METHODS_INCLUDE
+        value: io.opentelemetry.dice.DiceApplication[main];
+      - name: OTEL_INSTRUMENTATION_HTTP_SERVER_CAPTURE_RESPONSE_HEADERS
+        value: Content-Type,Date
+#      - name: OTEL_INSTRUMENTATION_TOMCAT_ENABLED
+#        value: "false"
+#      - name: OTEL_INSTRUMENTATION_SERVLET_ENABLED
+#        value: "false"

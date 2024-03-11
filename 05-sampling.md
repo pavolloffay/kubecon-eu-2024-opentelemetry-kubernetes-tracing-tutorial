@@ -10,16 +10,9 @@ This tutorial step covers the basic usage of the OpenTelemetry Collector on Kube
 
 ## Sampling, what does it mean and why is it important?
 
-Sampling refers to the practice of selectively capturing and recording traces of requests flowing through a distributed system, rather than capturing every single request. It is crucial in distributed tracing systems because modern distributed applications often generate a massive volume of requests and transactions, which can overwhelm the tracing infrastructure or lead to excessive storage costs if every request is
-traced in detail.
+Sampling refers to the practice of selectively capturing and recording traces of requests flowing through a distributed system, rather than capturing every single request. It is crucial in distributed tracing systems because modern distributed applications often generate a massive volume of requests and transactions, which can overwhelm the tracing infrastructure or lead to excessive storage costs if every request is traced in detail.
 
 For example, a medium sized setup producing ~1M traces per minute can result in a cost of approximately $250,000 per month. (Note that this depends on your infrastructure costs, the SaaS provider you choose, the amount of metadata, etc.)
-
-To get a better feel for the cost, you may want to play with some SaaS cost calculators.
-
-- TODO
-- TODO
-- TODO
 
 For more details, check the [offical documentation](https://opentelemetry.io/docs/concepts/sampling/).
 
@@ -40,19 +33,23 @@ Update the sampling % in the Instrumentation CR and restart the deployment for t
 https://github.com/pavolloffay/kubecon-eu-2024-opentelemetry-kubernetes-tracing-tutorial/blob/d4b917c1cc4a411f59ae5dd770b22de1de9f6020/app/instrumentation-head-sampling.yaml#L13-L15
 
 ```yaml
-kubectl apply -f https://raw.githubusercontent.com/pavolloffay/kubecon-eu-2024-opentelemetry-kubernetes-tracing-tutorial/app/instrumentation-head-sampling.yaml
+kubectl apply -f https://raw.githubusercontent.com/pavolloffay/kubecon-eu-2024-opentelemetry-kubernetes-tracing-tutorial/main/app/instrumentation-head-sampling.yaml
+kubectl rollout restart deploy -n tutorial-application
+kubectl get pods -w -n tutorial-application
 ```
 
-<details>
-  <summary>Jaeger's Remote Sampling extension</summary>
- 
-TODO:
-https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/main/extension/jaegerremotesampling/README.md
+See the pod spec for one of the deployment:
 
+```bash
+kubectl describe pod backend2-deployment-64ddcc76fd-w85zh -n tutorial-application
+```
 
-https://opentelemetry.io/docs/languages/sdk-configuration/general/#otel_traces_sampler_arg
- 
-</details>
+```diff
+    Environment:
+          OTEL_TRACES_SAMPLER:                 parentbased_traceidratio
+-         OTEL_TRACES_SAMPLER_ARG:             1
++         OTEL_TRACES_SAMPLER_ARG:             0.5
+```
 
 ### Tailbased Sampling
 
@@ -61,7 +58,7 @@ Tail sampling is where the decision to sample a trace takes place by considering
 Deploy the opentelemetry collector with `tail_sampling` enabled.
 
 ```shell
-kubectl apply -f https://raw.githubusercontent.com/pavolloffay/kubecon-eu-2024-opentelemetry-kubernetes-tracing-tutorial/backend/05-tail-sampling-collector.yaml
+kubectl apply -f https://raw.githubusercontent.com/pavolloffay/kubecon-eu-2024-opentelemetry-kubernetes-tracing-tutorial/main/backend/05-tail-sampling-collector.yaml
 kubectl get pods -n observability-backend -w
 ```
 
@@ -103,10 +100,16 @@ Requires two deployments of the Collector, the first layer routing all the spans
 Apply the YAML below to deploy a layer of Collectors containing the load-balancing exporter in front of collectors performing tail-sampling:
 
 ```shell
-kubectl apply -f https://raw.githubusercontent.com/pavolloffay/kubecon-eu-2024-opentelemetry-kubernetes-tracing-tutorial/backend/05-scale-otel-collectors.yaml
+kubectl apply -f https://raw.githubusercontent.com/pavolloffay/kubecon-eu-2024-opentelemetry-kubernetes-tracing-tutorial/main/backend/05-scale-otel-collectors.yaml
 kubectl get pods -n observability-backend -w
 ```
 
 <TODO: Add screenshot>
+
+### Advanced Topic: Jaeger's Remote Sampling extension
+ 
+TODO:
+https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/main/extension/jaegerremotesampling/README.md
+
 
 [Next steps](./06-RED-metrics.md)

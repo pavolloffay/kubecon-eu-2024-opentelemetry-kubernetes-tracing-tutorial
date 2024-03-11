@@ -49,7 +49,7 @@ workshop-control-plane   Ready    control-plane   75s   v1.27.3
 ```
 
 ### Cleanup
-
+k de
 ```bash
 kind delete cluster --name=workshop
 ```
