@@ -75,7 +75,7 @@ docker run --rm -it -p 127.0.0.1:4317:4317 -p 127.0.0.1:16686:16686 -e COLLECTOR
 ```
 
 ```bash
-OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:4317 OTEL_SERVICE_NAME=go-backend go run app/backend4/main.go
+OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:4317 OTEL_SERVICE_NAME=go-backend RATE_ERROR=20 RATE_HIGH_DELAY=20 go run app/backend4/main.go
 ```
 
 ## TODO: Publish container at ghcr.io/pavolloffay
@@ -87,7 +87,7 @@ kubectl apply -f https://raw.githubusercontent.com/pavolloffay/kubecon-eu-2024-o
 
 Details
 
-```yaml
+```diff
 apiVersion: apps/v1
 kind: Deployment
 metadata:

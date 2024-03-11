@@ -51,7 +51,7 @@ func main() {
 	tp := sdktrace.NewTracerProvider(sdktrace.WithBatcher(otelExporter))
 	otel.SetTracerProvider(tp)
 
-	v, ok := os.LookupEnv("ERROR_RATE")
+	v, ok := os.LookupEnv("RATE_ERROR")
 	if !ok {
 		v = "0"
 	}

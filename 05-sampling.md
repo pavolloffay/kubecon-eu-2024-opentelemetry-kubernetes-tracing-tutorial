@@ -58,7 +58,7 @@ Tail sampling is where the decision to sample a trace takes place by considering
 Update the ENV variables below in the backend2 deployment, which generates random spans with errors and latencies
 
 ```shell
-kubectl set env deployment backend2-deployment ERROR_RATE=50 RATE_HIGH_DELAY=50 -n tutorial-application 
+kubectl set env deployment backend2-deployment RATE_ERROR=50 RATE_HIGH_DELAY=50 -n tutorial-application 
 kubectl get pods -n tutorial-application -w
 ```
 

@@ -1,0 +1,38 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend2-deployment
+  namespace: tutorial-application
+  labels:
+    app: backend2
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backend2
+  template:
+    metadata:
+      labels:
+        app: backend2
+      annotations:
+        prometheus.io/scrape: "true"
+        instrumentation.opentelemetry.io/inject-sdk: "true"
+    spec:
+      containers:
+      - name: backend2
+        # TODO: switch to ghcr.io/pavolloffay
+        # https://github.com/users/frzifus/packages/container/package/kubecon-eu-2024-opentelemetry-kubernetes-tracing-tutorial-backend4
+        image: ghcr.io/frzifus/kubecon-eu-2024-opentelemetry-kubernetes-tracing-tutorial-backend4:with-instr
+        ports:
+        - containerPort: 5165
+        env:
+        - name: RATE_ERROR
+          value: 20
+        - name: RATE_HIGH_DELAY
+          value: 20
+        # NOTE: alternative to instrumentation annotation
+        # - name: OTEL_EXPORTER_OTLP_ENDPOINT
+        #   value: http://otel-collector.observability-backend.svc.cluster.local:4317
+        # - name: OTEL_SERVICE_NAME
+        #   value: go-backend
