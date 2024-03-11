@@ -27,6 +27,7 @@ spec:
       debug:
         verbosity: detailed
       loadbalancing:
+        routing_key: "traceID"
         protocol:
           otlp:
             timeout: 1s
@@ -51,7 +52,7 @@ spec:
         traces:
           receivers: [otlp]
           processors: [batch]
-          exporters: [otlp/traces]
+          exporters: [loadbalancing]
         metrics:
           receivers: [otlp]
           exporters: [otlphttp/metrics]

@@ -113,6 +113,24 @@ prometheus-77f88ccf7f-dfwh2               1/1     Running   0          100m
 
 ```
 
+```yaml
+  exporters:
+    debug:
+      verbosity: detailed
+    loadbalancing:
+      routing_key: "traceID"
+      protocol:
+        otlp:
+          timeout: 1s
+          tls:
+            insecure: true
+      resolver:
+        k8s:
+          service: otel-gateway.observability-backend
+          ports: 
+            - 4317
+```
+
 <TODO: Add screenshot>
 
 ### Advanced Topic: Jaeger's Remote Sampling extension

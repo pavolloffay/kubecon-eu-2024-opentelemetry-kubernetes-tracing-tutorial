@@ -70,7 +70,7 @@ spec:
     spec:
       containers:
       - name: backend2
-        image: ghcr.io/pavolloffay/kubecon-eu-2024-opentelemetry-kubernetes-tracing-tutorial-backend2:latest
+        image: ghcr.io/pavolloffay/kubecon-eu-2024-opentelemetry-kubernetes-tracing-tutorial-backend4:latest
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 5165
