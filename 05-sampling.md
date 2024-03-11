@@ -101,4 +101,13 @@ Requires two deployments of the Collector, the first layer routing all the spans
 
 [excalidraw](https://excalidraw.com/#room=6a15d65ba4615c535a40,xcZD6DG977owHRoxpYY4Ag)
 
+Apply the YAML below to deploy a layer of Collectors containing the load-balancing exporter in front of collectors performing tail-sampling:
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/pavolloffay/kubecon-eu-2024-opentelemetry-kubernetes-tracing-tutorial/backend/05-scale-otel-collectors.yaml
+kubectl get pods -n observability-backend -w
+```
+
+<TODO: Add screenshot>
+
 [Next steps](./06-RED-metrics.md)
