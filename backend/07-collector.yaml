@@ -1,0 +1,60 @@
+apiVersion: opentelemetry.io/v1alpha1
+kind: OpenTelemetryCollector
+metadata:
+  name: otel
+  namespace: observability-backend
+spec:
+  image: ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector-contrib:0.94.0
+  mode: deployment
+  replicas: 1
+  ports:
+    - port: 8888
+      protocol: TCP
+      name: metrics
+  config: |
+    receivers:
+      otlp:
+        protocols:
+          grpc:
+            endpoint: 0.0.0.0:4317
+          http:
+            endpoint: 0.0.0.0:4318
+    
+    processors:
+      batch:
+      transform:
+        error_mode: ignore
+        trace_statements:
+          - context: span
+            statements:
+                - set(attributes["app.player1"], Substring(attributes["app.player1"], 0, 1)) where attributes["app.player1"] != ""
+                - set(attributes["app.player2"], Substring(attributes["app.player2"], 0, 1)) where attributes["app.player2"] != ""
+                - replace_all_patterns(attributes, "value", "player1=[a-zA-Z]*", "player1={playerName}")
+                - replace_all_patterns(attributes, "value", "player2=[a-zA-Z]*", "player2={playerName}")
+
+    exporters:
+      otlp/traces:
+        endpoint: jaeger-collector:4317
+        tls:
+          insecure: true
+      
+      otlphttp/metrics:
+        endpoint: http://prometheus.observability-backend.svc.cluster.local:80/api/v1/otlp/
+        tls:
+          insecure: true
+      
+      debug:
+        verbosity: detailed
+
+    service:
+      pipelines:
+        traces:
+          receivers: [otlp]
+          processors: [transform, batch]
+          exporters: [otlp/traces]
+        metrics:
+          receivers: [otlp]
+          exporters: [otlphttp/metrics]
+        logs:
+          receivers: [otlp]
+          exporters: [debug]
