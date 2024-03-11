@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"crypto/sha256"
-	"flag"
 	"fmt"
 	"math/rand"
 	"net/http"
@@ -17,8 +16,6 @@ import (
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 	"go.opentelemetry.io/otel/trace"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
 )
 
 var tracer = otel.GetTracerProvider().Tracer("github.com/kubecon-eu-2024/backend")
@@ -46,29 +43,14 @@ func init() {
 }
 
 func main() {
-	var otlpAddr = flag.String("otlp-grpc", "", "default otlp/gRPC address, by default disabled. Example value: localhost:4317")
-	flag.Parse()
-	if *otlpAddr != "" {
-		ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
-		defer cancel()
-
-		grpcOptions := []grpc.DialOption{grpc.WithTransportCredentials(insecure.NewCredentials()), grpc.WithBlock()}
-		conn, err := grpc.DialContext(ctx, *otlpAddr, grpcOptions...)
-		if err != nil {
-			fmt.Printf("failed to create gRPC connection to collector: %s\n", err)
-			os.Exit(1)
-		}
-		defer conn.Close()
-
-		// Set up a trace exporter
-		otelExporter, err := otlptracegrpc.New(ctx, otlptracegrpc.WithGRPCConn(conn))
-		if err != nil {
-			fmt.Printf("failed to create trace exporter: %s\n", err)
-			os.Exit(1)
-		}
-		tp := sdktrace.NewTracerProvider(sdktrace.WithSyncer(otelExporter))
-		otel.SetTracerProvider(tp)
+	otelExporter, err := otlptracegrpc.New(context.Background())
+	if err != nil {
+		fmt.Printf("failed to create trace exporter: %s\n", err)
+		os.Exit(1)
 	}
+	tp := sdktrace.NewTracerProvider(sdktrace.WithBatcher(otelExporter))
+	otel.SetTracerProvider(tp)
+
 	v, ok := os.LookupEnv("ERROR_RATE")
 	if !ok {
 		v = "0"

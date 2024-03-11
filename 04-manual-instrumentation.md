@@ -1,39 +1,31 @@
 # Manual instrumentation using the OpenTelemetry SDK
 
-# Register Tracer
+This tutorial section covers the manual instrumentation of a go application with the opentelemetry-sdk.
 
-```go
-var tracer = otel.GetTracerProvider().Tracer("github.com/kubecon-eu-2024/backend")
+As a basis for the instrumentation we use [backend4](./app/backend4/main.go). To compile the application you need [go 1.22 or newer](https://go.dev/doc/install).
+
+# Configure OpenTelemetry-go-sdk
+
+```diff
+func main() {
++	otelExporter, err := otlptracegrpc.New(context.Background())
++	if err != nil {
++		fmt.Printf("failed to create trace exporter: %s\n", err)
++		os.Exit(1)
++	}
++	tp := sdktrace.NewTracerProvider(sdktrace.WithBatcher(otelExporter))
++	otel.SetTracerProvider(tp)
+...
 ```
 
 
-# init
+## Create and register a global trace provider
 
-```go
-	var otlpAddr = flag.String("otlp-grpc", "", "default otlp/gRPC address, by default disabled. Example value: localhost:4317")
-	flag.Parse()
-	if *otlpAddr != "" {
-		ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
-		defer cancel()
-
-		grpcOptions := []grpc.DialOption{grpc.WithTransportCredentials(insecure.NewCredentials()), grpc.WithBlock()}
-		conn, err := grpc.DialContext(ctx, *otlpAddr, grpcOptions...)
-		if err != nil {
-			fmt.Printf("failed to create gRPC connection to collector: %s\n", err)
-			os.Exit(1)
-		}
-		defer conn.Close()
-
-		// Set up a trace exporter
-		otelExporter, err := otlptracegrpc.New(ctx, otlptracegrpc.WithGRPCConn(conn))
-		if err != nil {
-			fmt.Printf("failed to create trace exporter: %s\n", err)
-			os.Exit(1)
-		}
-		tp := sdktrace.NewTracerProvider(sdktrace.WithSyncer(otelExporter))
-		otel.SetTracerProvider(tp)
-	}
+```diff
++var tracer = otel.GetTracerProvider().Tracer("github.com/kubecon-eu-2024/backend")
 ```
+
+## Identifying critical path and operations for instrumentation
 
 ```diff
 	mux.HandleFunc("GET /rolldice", func(w http.ResponseWriter, r *http.Request) {
@@ -74,6 +66,16 @@ func causeDelay(ctx context.Context, rate int) {
 		time.Sleep(time.Duration(2+rand.Intn(3)) * time.Second)
 	}
 }
+```
+
+## Configuring an OTLP exporter and setting the endpoint
+
+```bash
+ocker run --rm -it -p 127.0.0.1:4317:4317 -p 127.0.0.1:16686:16686 -e COLLECTOR_OTLP_ENABLED=true -e LOG_LEVEL=debug  jaegertracing/all-in-one:latest
+```
+
+```bash
+OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:4317 OTEL_SERVICE_NAME=go-backend go run app/backend4/main.go
 ```
 
 ---
