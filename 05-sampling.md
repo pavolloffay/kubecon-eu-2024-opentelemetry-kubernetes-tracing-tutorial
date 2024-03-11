@@ -85,10 +85,6 @@ kubectl get pods -n observability-backend -w
         ]
 ```
 
-Backend 1 generates random errors for player 'bene', while Backend 2 introduces random delays for player 'anusha'.
-
-Now let's execute some requests on the app [http://localhost:4000/?player1=bene&player2=anusha](http://localhost:4000/) and see traces in the Jaeger console [http://localhost:16686/](http://localhost:16686/).
-
 <TODO: Add screenshot>
 
 
