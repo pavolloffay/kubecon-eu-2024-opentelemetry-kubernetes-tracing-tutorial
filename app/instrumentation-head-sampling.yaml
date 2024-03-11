@@ -1,0 +1,28 @@
+apiVersion: opentelemetry.io/v1alpha1
+kind: Instrumentation
+metadata:
+  name: my-instrumentation
+  namespace: tutorial-application
+spec:
+  exporter:
+    endpoint: http://otel-collector.observability-backend.svc.cluster.local:4317
+  propagators:
+    - tracecontext
+    - baggage
+    - b3
+  sampler:
+    type: parentbased_traceidratio
+    argument: "0.5"
+  resource:
+    addK8sUIDAttributes: false
+  python:
+    env:
+      # Required if endpoint is set to 4317.
+      # Python autoinstrumentation uses http/proto by default
+      # so data must be sent to 4318 instead of 4317.
+      - name: OTEL_EXPORTER_OTLP_ENDPOINT
+        value: http://otel-collector.observability-backend.svc.cluster.local:4318
+  java:
+    env:
+      - name: OTEL_LOGS_EXPORTER
+        value: otlp

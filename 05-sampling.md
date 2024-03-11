@@ -8,15 +8,6 @@ This tutorial step covers the basic usage of the OpenTelemetry Collector on Kube
 
 [excalidraw](https://excalidraw.com/#json=15BrdSOMEkc9RA5cxeqwz,urTmfk01mbx7V-PpQI7KgA)
 
-### OpenTelemetry Collector on k8s
-
-After installing the OpenTelemetry Operator, the `v1alpha1.OpenTelemetryCollector` simplifies the operation of the OpenTelemetry Collector on Kubernetes. There are different deployment modes available, breaking config changes are migrated automatically, provides integration with Prometheus (including operating on Prometheus Operator CRs) and simplifies sidecar injection.
-
-TODO: update collector
-```yaml
-
-```
-
 ## Sampling, what does it mean and why is it important?
 
 Sampling refers to the practice of selectively capturing and recording traces of requests flowing through a distributed system, rather than capturing every single request. It is crucial in distributed tracing systems because modern distributed applications often generate a massive volume of requests and transactions, which can overwhelm the tracing infrastructure or lead to excessive storage costs if every request is
@@ -64,9 +55,16 @@ https://opentelemetry.io/docs/languages/sdk-configuration/general/#otel_traces_s
 
 Tail sampling is where the decision to sample a trace takes place by considering all or most of the spans within the trace. Tail Sampling gives you the option to sample your traces based on specific criteria derived from different parts of a trace, which isn’t an option with Head Sampling.
 
-Usecase: Sample 100% of the traces that have an error-ing span in them.
+Deploy the opentelemetry collector with `tail_sampling` enabled.
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/pavolloffay/kubecon-eu-2024-opentelemetry-kubernetes-tracing-tutorial/backend/05-tail-sampling-collector.yaml
+kubectl get pods -n observability-backend -w
+```
 
 ```yaml
+  # Sample 100% of traces with ERROR-ing spans (omit traces with all OK spans)
+  # and traces which have a duration longer than 500ms
   processors: 
     tail_sampling:
       decision_wait: 10s # time to wait before making a sampling decision is made
@@ -87,11 +85,8 @@ Usecase: Sample 100% of the traces that have an error-ing span in them.
         ]
 ```
 
-Applying this chart will start a new collector with the tailsampling processor
+<TODO: Add screenshot>
 
-```shell
-kubectl apply -f https://raw.githubusercontent.com/pavolloffay/kubecon-eu-2024-opentelemetry-kubernetes-tracing-tutorial/backend/03-tail-sampling-config.yaml
-```
 
 -----
 ### Advanced Topic: Sampling at scale with OpenTelemetry
@@ -101,5 +96,14 @@ Requires two deployments of the Collector, the first layer routing all the spans
 ![OpenTelemetry Sampling](images/scaling-otel-collector.jpg)
 
 [excalidraw](https://excalidraw.com/#room=6a15d65ba4615c535a40,xcZD6DG977owHRoxpYY4Ag)
+
+Apply the YAML below to deploy a layer of Collectors containing the load-balancing exporter in front of collectors performing tail-sampling:
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/pavolloffay/kubecon-eu-2024-opentelemetry-kubernetes-tracing-tutorial/backend/05-scale-otel-collectors.yaml
+kubectl get pods -n observability-backend -w
+```
+
+<TODO: Add screenshot>
 
 [Next steps](./06-RED-metrics.md)
