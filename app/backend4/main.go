@@ -100,7 +100,7 @@ func main() {
 	})
 	mux.HandleFunc("GET /metrics", promhttp.Handler().ServeHTTP)
 	srv := &http.Server{
-		Addr:    "0.0.0.0:8080",
+		Addr:    "0.0.0.0:5165",
 		Handler: mux,
 	}
 

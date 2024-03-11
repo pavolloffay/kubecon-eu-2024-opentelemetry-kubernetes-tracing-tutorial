@@ -71,11 +71,44 @@ func causeDelay(ctx context.Context, rate int) {
 ## Configuring an OTLP exporter and setting the endpoint
 
 ```bash
-ocker run --rm -it -p 127.0.0.1:4317:4317 -p 127.0.0.1:16686:16686 -e COLLECTOR_OTLP_ENABLED=true -e LOG_LEVEL=debug  jaegertracing/all-in-one:latest
+docker run --rm -it -p 127.0.0.1:4317:4317 -p 127.0.0.1:16686:16686 -e COLLECTOR_OTLP_ENABLED=true -e LOG_LEVEL=debug  jaegertracing/all-in-one:latest
 ```
 
 ```bash
 OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:4317 OTEL_SERVICE_NAME=go-backend go run app/backend4/main.go
+```
+
+## TODO: Publish container at ghcr.io/pavolloffay
+
+Apply `backend2` drop-in replacement:
+```bash
+kubectl apply -f https://raw.githubusercontent.com/pavolloffay/kubecon-eu-2024-opentelemetry-kubernetes-tracing-tutorial/main/backend/04-backend.yaml
+```
+
+Details
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend2-deployment
+  namespace: tutorial-application
+  labels:
+    app: backend2
+spec:
+  template:
+    metadata:
+      labels:
+        app: backend2
+      annotations:
+        prometheus.io/scrape: "true"
++        instrumentation.opentelemetry.io/inject-sdk: "true"
+  template:
+    spec:
+      containers:
+      - name: backend2
+-        image: ghcr.io/pavolloffay/kubecon-eu-2024-opentelemetry-kubernetes-tracing-tutorial-backend2:latest
++        image: ghcr.io/frzifus/kubecon-eu-2024-opentelemetry-kubernetes-tracing-tutorial-backend4:latest
 ```
 
 ---
