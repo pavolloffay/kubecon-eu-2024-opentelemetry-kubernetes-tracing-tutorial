@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"math/rand"
 	"net/http"
+	"os"
 	"strconv"
 	"time"
 
@@ -36,6 +37,15 @@ func init() {
 }
 
 func main() {
+	v, ok := os.LookupEnv("ERROR_RATE")
+	if !ok {
+		v = "0"
+	}
+	rate, err := strconv.Atoi(v)
+	if err != nil {
+		panic(err)
+	}
+
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /rolldice", func(w http.ResponseWriter, r *http.Request) {
 		player := "Anonymous player"
@@ -49,6 +59,10 @@ func main() {
 			max = 6
 		}
 		result := doRoll(r.Context(), max)
+		if err := causeError(r.Context(), rate); err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
 		resStr := strconv.Itoa(result)
 		rollCounter.Inc()
 		numbersCounter.WithLabelValues(resStr).Inc()
@@ -68,10 +82,18 @@ func main() {
 	}
 }
 
+func causeError(_ context.Context, rate int) error {
+	randomNumber := rand.Intn(100)
+	if randomNumber < rate {
+		return fmt.Errorf("internal server error")
+	}
+	return nil
+}
+
 func doRoll(_ context.Context, max int) int {
 	result := rand.Intn(max) + 1
 	if result > 6 {
-		time.Sleep(time.Duration(0.1*float64(result)) * time.Second)
+		time.Sleep(time.Duration(0.5*float64(result)) * time.Second)
 	}
 	return result
 }
