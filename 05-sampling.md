@@ -8,15 +8,6 @@ This tutorial step covers the basic usage of the OpenTelemetry Collector on Kube
 
 [excalidraw](https://excalidraw.com/#json=15BrdSOMEkc9RA5cxeqwz,urTmfk01mbx7V-PpQI7KgA)
 
-### OpenTelemetry Collector on k8s
-
-After installing the OpenTelemetry Operator, the `v1alpha1.OpenTelemetryCollector` simplifies the operation of the OpenTelemetry Collector on Kubernetes. There are different deployment modes available, breaking config changes are migrated automatically, provides integration with Prometheus (including operating on Prometheus Operator CRs) and simplifies sidecar injection.
-
-TODO: update collector
-```yaml
-
-```
-
 ## Sampling, what does it mean and why is it important?
 
 Sampling refers to the practice of selectively capturing and recording traces of requests flowing through a distributed system, rather than capturing every single request. It is crucial in distributed tracing systems because modern distributed applications often generate a massive volume of requests and transactions, which can overwhelm the tracing infrastructure or lead to excessive storage costs if every request is
