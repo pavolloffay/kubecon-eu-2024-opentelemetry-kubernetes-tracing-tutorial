@@ -55,6 +55,13 @@ kubectl describe pod backend2-deployment-64ddcc76fd-w85zh -n tutorial-applicatio
 
 Tail sampling is where the decision to sample a trace takes place by considering all or most of the spans within the trace. Tail Sampling gives you the option to sample your traces based on specific criteria derived from different parts of a trace, which isn’t an option with Head Sampling.
 
+Update the ENV variables below in the backend2 deployment, which generates random spans with errors and latencies
+
+```shell
+kubectl set env deployment backend2-deployment ERROR_RATE=50 RATE_HIGH_DELAY=50 -n tutorial-application 
+kubectl get pods -n tutorial-application -w
+```
+
 Deploy the opentelemetry collector with `tail_sampling` enabled.
 
 ```shell
@@ -85,8 +92,11 @@ kubectl get pods -n observability-backend -w
         ]
 ```
 
-<TODO: Add screenshot>
+Now let's execute some requests on the app [http://localhost:4000/](http://localhost:4000/) and see traces in the Jaeger console [http://localhost:16686/](http://localhost:16686/).
 
+We should only see traces with errors and latencies exceeding 500ms.
+
+<TODO: Add screenshot>
 
 -----
 ### Advanced Topic: Sampling at scale with OpenTelemetry
@@ -116,7 +126,7 @@ prometheus-77f88ccf7f-dfwh2               1/1     Running   0          100m
 ```yaml
   exporters:
     debug:
-      verbosity: detailed
+    # routing_key property is used to route spans to exporters based on traceID/service name
     loadbalancing:
       routing_key: "traceID"
       protocol:
@@ -130,8 +140,6 @@ prometheus-77f88ccf7f-dfwh2               1/1     Running   0          100m
           ports: 
             - 4317
 ```
-
-<TODO: Add screenshot>
 
 ### Advanced Topic: Jaeger's Remote Sampling extension
  
