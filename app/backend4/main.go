@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"crypto/sha256"
+	"flag"
 	"fmt"
 	"math/rand"
 	"net/http"
@@ -12,7 +13,15 @@ import (
 
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
+	sdktrace "go.opentelemetry.io/otel/sdk/trace"
+	"go.opentelemetry.io/otel/trace"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 )
+
+var tracer = otel.GetTracerProvider().Tracer("github.com/kubecon-eu-2024/backend")
 
 var (
 	rollCounter = prometheus.NewCounter(
@@ -37,6 +46,29 @@ func init() {
 }
 
 func main() {
+	var otlpAddr = flag.String("otlp-grpc", "", "default otlp/gRPC address, by default disabled. Example value: localhost:4317")
+	flag.Parse()
+	if *otlpAddr != "" {
+		ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+		defer cancel()
+
+		grpcOptions := []grpc.DialOption{grpc.WithTransportCredentials(insecure.NewCredentials()), grpc.WithBlock()}
+		conn, err := grpc.DialContext(ctx, *otlpAddr, grpcOptions...)
+		if err != nil {
+			fmt.Printf("failed to create gRPC connection to collector %w", err)
+			os.Exit(1)
+		}
+		defer conn.Close()
+
+		// Set up a trace exporter
+		otelExporter, err := otlptracegrpc.New(ctx, otlptracegrpc.WithGRPCConn(conn))
+		if err != nil {
+			fmt.Printf("failed to create trace exporter %w", err)
+			os.Exit(1)
+		}
+		tp := sdktrace.NewTracerProvider(sdktrace.WithSyncer(otelExporter))
+		otel.SetTracerProvider(tp)
+	}
 	v, ok := os.LookupEnv("ERROR_RATE")
 	if !ok {
 		v = "0"
@@ -57,6 +89,9 @@ func main() {
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /rolldice", func(w http.ResponseWriter, r *http.Request) {
+		var span trace.Span
+		ctx, span := tracer.Start(r.Context(), "rolldice")
+		defer span.End()
 		player := "Anonymous player"
 		if p := r.URL.Query().Get("player"); p != "" {
 			player = p
@@ -67,12 +102,12 @@ func main() {
 		} else {
 			max = 6
 		}
-		result := doRoll(r.Context(), max)
-		if err := causeError(r.Context(), rateError); err != nil {
+		result := doRoll(ctx, max)
+		causeDelay(ctx, rateDelay)
+		if err := causeError(ctx, rateError); err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
-		causeDelay(r.Context(), rateDelay)
 		resStr := strconv.Itoa(result)
 		rollCounter.Inc()
 		numbersCounter.WithLabelValues(resStr).Inc()
@@ -92,16 +127,27 @@ func main() {
 	}
 }
 
-func causeError(_ context.Context, rate int) error {
+func causeError(ctx context.Context, rate int) error {
+	var span trace.Span
+	_, span = tracer.Start(ctx, "causeError")
+	defer span.End()
+
 	randomNumber := rand.Intn(100)
+	span.AddEvent(fmt.Sprintf("random nr: %d", randomNumber))
 	if randomNumber < rate {
-		return fmt.Errorf("internal server error")
+		err := fmt.Errorf("internal server error")
+		span.RecordError(err)
+		return err
 	}
 	return nil
 }
 
-func causeDelay(_ context.Context, rate int) {
+func causeDelay(ctx context.Context, rate int) {
+	var span trace.Span
+	_, span = tracer.Start(ctx, "causeDelay")
+	defer span.End()
 	randomNumber := rand.Intn(100)
+	span.AddEvent(fmt.Sprintf("random nr: %d", randomNumber))
 	if randomNumber < rate {
 		time.Sleep(time.Duration(2+rand.Intn(3)) * time.Second)
 	}
