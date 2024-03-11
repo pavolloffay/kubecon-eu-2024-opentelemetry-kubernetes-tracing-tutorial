@@ -58,7 +58,7 @@ Tail sampling is where the decision to sample a trace takes place by considering
 Deploy the opentelemetry collector with `tail_sampling` enabled.
 
 ```shell
-kubectl apply -f https://raw.githubusercontent.com/pavolloffay/kubecon-eu-2024-opentelemetry-kubernetes-tracing-tutorial/backend/03-tail-sampling-config.yaml
+kubectl apply -f https://raw.githubusercontent.com/pavolloffay/kubecon-eu-2024-opentelemetry-kubernetes-tracing-tutorial/backend/05-tail-sampling-collector.yaml
 kubectl get pods -n observability-backend -w
 ```
 
