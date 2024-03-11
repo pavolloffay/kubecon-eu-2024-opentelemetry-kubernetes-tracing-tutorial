@@ -55,7 +55,7 @@ func main() {
 		grpcOptions := []grpc.DialOption{grpc.WithTransportCredentials(insecure.NewCredentials()), grpc.WithBlock()}
 		conn, err := grpc.DialContext(ctx, *otlpAddr, grpcOptions...)
 		if err != nil {
-			fmt.Printf("failed to create gRPC connection to collector %w", err)
+			fmt.Printf("failed to create gRPC connection to collector: %s\n", err)
 			os.Exit(1)
 		}
 		defer conn.Close()
@@ -63,7 +63,7 @@ func main() {
 		// Set up a trace exporter
 		otelExporter, err := otlptracegrpc.New(ctx, otlptracegrpc.WithGRPCConn(conn))
 		if err != nil {
-			fmt.Printf("failed to create trace exporter %w", err)
+			fmt.Printf("failed to create trace exporter: %s\n", err)
 			os.Exit(1)
 		}
 		tp := sdktrace.NewTracerProvider(sdktrace.WithSyncer(otelExporter))
