@@ -58,7 +58,7 @@ Tail sampling is where the decision to sample a trace takes place by considering
 Deploy the opentelemetry collector with `tail_sampling` enabled.
 
 ```shell
-kubectl apply -f https://raw.githubusercontent.com/pavolloffay/kubecon-eu-2024-opentelemetry-kubernetes-tracing-tutorial/main/backend/05-tail-sampling-collector.yaml
+kubectl apply -f https://raw.githubusercontent.com/pavolloffay/kubecon-eu-2024-opentelemetry-kubernetes-tracing-tutorial/main/backend/05-collector-1.yaml
 kubectl get pods -n observability-backend -w
 ```
 
@@ -100,8 +100,17 @@ Requires two deployments of the Collector, the first layer routing all the spans
 Apply the YAML below to deploy a layer of Collectors containing the load-balancing exporter in front of collectors performing tail-sampling:
 
 ```shell
-kubectl apply -f https://raw.githubusercontent.com/pavolloffay/kubecon-eu-2024-opentelemetry-kubernetes-tracing-tutorial/main/backend/05-scale-otel-collectors.yaml
+kubectl apply -f https://raw.githubusercontent.com/pavolloffay/kubecon-eu-2024-opentelemetry-kubernetes-tracing-tutorial/main/backend/05-collector-2.yaml
 kubectl get pods -n observability-backend -w
+```
+
+```bash
+jaeger-bc5f49d78-627ct                    1/1     Running   0          100m
+otel-collector-6cc77b975c-plqth           1/1     Running   0          15m
+otel-gateway-collector-6bfbc5f68b-98wx5   1/1     Running   0          6m40s
+otel-gateway-collector-6bfbc5f68b-hrrcq   1/1     Running   0          6m40s
+prometheus-77f88ccf7f-dfwh2               1/1     Running   0          100m
+
 ```
 
 <TODO: Add screenshot>
