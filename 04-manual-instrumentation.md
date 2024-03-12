@@ -37,7 +37,7 @@ In our example backend, the entry point `/rolldice` starts our critial operation
 
 Using the prevously defined tracer, we can create a new spans. The method `Start` creates a span and a `context.Context` containing the newly-created span. If the context.Context provided in `ctx` contains a Span then the newly-created Span will be a child of that span, otherwise it will be a root span.
 
-Keep in mind that any Span that is created `MUST` also be ended. This is the responsibility of the user. Implementations of this API may leak memory or other resources if Spans are not ended. (Documentation)[https://pkg.go.dev/go.opentelemetry.io/otel/trace#Tracer].
+Keep in mind that any Span that is created `MUST` also be ended. This is the responsibility of the user. Implementations of this API may leak memory or other resources if Spans are not ended. [Documentation](https://pkg.go.dev/go.opentelemetry.io/otel/trace#Tracer).
 
 When defining a span name, it's important to choose descriptive and meaningful names that accurately reflect the operation being performed.
 
@@ -80,7 +80,7 @@ func causeError(ctx context.Context, rate int) error {
 
 In the same execution path we also find a function that ensures high delays of our `/rolldice` endpoint with a fixed probability.
 
-<TODO: Insert Image>
+![OpenTelemetry-SDK Error](images/rolldice-error.png)
 
 ### Add a custom Event
 
@@ -99,7 +99,7 @@ func causeDelay(ctx context.Context, rate int) {
 }
 ```
 
-<TODO: Insert Image>
+![OpenTelemetry-SDK Event](images/rolldice-delay.png)
 
 Once the code has been instrumented, we can use `go mod tidy` to update the existing `go.mod` file and start testing our application.
 
@@ -113,7 +113,7 @@ docker run --rm -it -p 127.0.0.1:4317:4317 -p 127.0.0.1:16686:16686 -e COLLECTOR
 
 Now we can configure our application with a specific `RATE_ERROR` and `RATE_DELAY` in `%`. This indicates how many traces should be delayed and/or cause an error.
 
-Finally we need to configure the OpenTelemetry-SDK, by default we can use common environment variables. (Documentation)[https://opentelemetry.io/docs/languages/sdk-configuration/]
+Finally we need to configure the OpenTelemetry-SDK, by default we can use common environment variables. [Documentation](https://opentelemetry.io/docs/languages/sdk-configuration/)
 
 ```bash
 OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:4317 OTEL_SERVICE_NAME=go-backend RATE_ERROR=20 RATE_HIGH_DELAY=20 go run app/backend4/main.go
