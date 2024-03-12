@@ -14,7 +14,7 @@ spec:
     type: parentbased_traceidratio
     argument: "1"
   resource:
-    addK8sUIDAttributes: false
+    addK8sUIDAttributes: true
   python:
     env:
       # Required if endpoint is set to 4317.

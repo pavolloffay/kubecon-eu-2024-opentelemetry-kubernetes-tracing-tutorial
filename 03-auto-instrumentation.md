@@ -124,6 +124,7 @@ kubectl patch deployment frontend-deployment -n tutorial-application -p '{"spec"
 kubectl patch deployment backend1-deployment -n tutorial-application -p '{"spec": {"template":{"metadata":{"annotations":{"instrumentation.opentelemetry.io/inject-python":"true"}}}} }'
 kubectl patch deployment backend2-deployment -n tutorial-application -p '{"spec": {"template":{"metadata":{"annotations":{"instrumentation.opentelemetry.io/inject-java":"true"}}}} }'
 kubectl get pods -n tutorial-application -w
+# Port forward again -> kubectl port-forward service/frontend-service -n tutorial-application 4000:4000 
 ...
 NAME                                   READY   STATUS              RESTARTS   AGE
 backend1-deployment-559946d88-c6zq7    0/1     Init:0/1            0          1s
@@ -169,11 +170,13 @@ Now let's execute some requests on the app [http://localhost:4000/](http://local
 ![Trace search](./images/jaeger-trace-search.jpg)
 ![Trace detail](./images/jaeger-trace-detail.jpg)
 
-In addition to traces in the Java auto-instrumentation also emits logs and metrics.
+In addition to traces in the Java auto-instrumentation also emits **logs** and **metrics**.
 The logs in our case are printed into the collector stdout via `debug` exporter and metrics are sent via OTLP HTTP into Prometheus.
 The OpenTelemetry spec defines that the following metrics should be collected: [HTTP metrics](https://opentelemetry.io/docs/specs/semconv/http/http-metrics/).
 
 ```bash
+kubectl logs deployment.apps/otel-collector -n observability-backend
+...
 2024-02-28T10:08:21.807Z	info	LogsExporter	{"kind": "exporter", "data_type": "logs", "name": "debug", "resource logs": 1, "log records": 7}
 2024-02-28T10:08:21.807Z	info	ResourceLog #0
 Resource SchemaURL: https://opentelemetry.io/schemas/1.21.0
@@ -221,10 +224,42 @@ ObservedTimestamp: 2024-02-28 10:08:21.638118261 +0000 UTC
 Timestamp: 2024-02-28 10:08:21.638 +0000 UTC
 SeverityText: INFO
 SeverityNumber: Info(9)
-Body: Str(Started DiceApplication in 2.105 seconds (process running for 4.485))
+Body: Str(Started DiceApplication in 3.459 seconds (process running for 6.305))
 Trace ID: 3bde5d3ee82303571bba6e1136781fe4
 Span ID: 46de5d3ee82303571bba6e1136781fe4
 Flags: 0
+
+
+kubectl logs -n tutorial-application deployment.apps/backend2-deployment
+...
+Defaulted container "backend2" out of: backend2, opentelemetry-auto-instrumentation-java (init)
+Picked up JAVA_TOOL_OPTIONS:  -javaagent:/otel-auto-instrumentation-java/javaagent.jar
+OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
+[otel.javaagent 2024-03-12 17:35:52:181 +0000] [main] INFO io.opentelemetry.javaagent.tooling.VersionLogger - opentelemetry-javaagent - version: 1.32.1
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+ :: Spring Boot ::                (v3.0.5)
+
+2024-03-12T17:35:55.712Z  INFO 7 --- [           main] io.opentelemetry.dice.DiceApplication    : Starting DiceApplication v0.0.1-SNAPSHOT using Java 21.0.2 with PID 7 (/usr/src/app/build/libs/dice-0.0.1-SNAPSHOT.jar started by root in /usr/src/app)
+2024-03-12T17:35:55.749Z  INFO 7 --- [           main] io.opentelemetry.dice.DiceApplication    : No active profile set, falling back to 1 default profile: "default"
+2024-03-12T17:35:57.556Z  INFO 7 --- [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port(s): 5165 (http)
+2024-03-12T17:35:57.588Z  INFO 7 --- [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2024-03-12T17:35:57.589Z  INFO 7 --- [           main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.7]
+2024-03-12T17:35:57.667Z  INFO 7 --- [           main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2024-03-12T17:35:57.669Z  INFO 7 --- [           main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 1800 ms
+2024-03-12T17:35:58.293Z  INFO 7 --- [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port(s): 5165 (http) with context path ''
+2024-03-12T17:35:58.308Z  INFO 7 --- [           main] io.opentelemetry.dice.DiceApplication    : Started DiceApplication in 3.459 seconds (process running for 6.305)
+2024-03-12T17:37:04.363Z  INFO 7 --- [nio-5165-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2024-03-12T17:37:04.364Z  INFO 7 --- [nio-5165-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2024-03-12T17:37:04.365Z  INFO 7 --- [nio-5165-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 1 ms
+2024-03-12T17:37:04.435Z  INFO 7 --- [nio-5165-exec-1] io.opentelemetry.dice.RollController     : Player 2 is rolling the dice: 2
+2024-03-12T17:37:04.736Z  WARN 7 --- [nio-5165-exec-3] io.opentelemetry.dice.RollController     : Illegal number rolled, setting result to '1'
+2024-03-12T17:37:04.737Z  INFO 7 --- [nio-5165-exec-3] io.opentelemetry.dice.RollController     : Player 2 is rolling the dice: 1
 ```
 
 ```bash
@@ -234,9 +269,30 @@ Open Prometheus in the browser [localhost:8080](http://localhost:8080/graph?g0.e
 
 ![Metrics from Java agent from backend2-deployment](./images/prometheus_javaagent_metrics_list.jpg)
 
-### Customize spans created by the auto-instrumentation
+### Customize Java auto-instrumentation with config (capture more data)
 
-In this section we will modify [Java backend2](./app/backend2) service to:  
+In this section we will configure the Java auto-instrumentation by modifying `Instrumentation` CR to:
+* create custom spans - for the main method of the application
+* capture server response HTTP headers
+
+See the [Java agent docs](https://opentelemetry.io/docs/languages/java/automatic/configuration/) with all the configuration options.
+
+See the [Instrumentation CR](./app/instrumentation-java-custom-config.yaml).
+
+```bash
+kubectl apply -f https://raw.githubusercontent.com/pavolloffay/kubecon-eu-2024-opentelemetry-kubernetes-tracing-tutorial/main/app/instrumentation-java-custom-config.yaml
+kubectl rollout restart deployment.apps/backend2-deployment -n tutorial-application
+kubectl get pods -w -n tutorial-application
+```
+
+![Span from backend2-deployment](./images/jaeger-capture-custom-headers.jpg)
+
+### Customize Java auto-instrumentation with code (capture more data)
+
+> [!NOTE]  
+> This is an optional more advanced section.
+
+In this section we will modify [Java backend2](./app/backend2) service to:
 * create a new span to observe execution of a business method
 * attach attributes to span
 
@@ -281,24 +337,6 @@ kubectl get pods -w -n tutorial-application
 ```
 
 ![Span from backend2-deployment](./images/jaeger-with-span.jpg)
-
-### Customize Java auto-instrumentation
-
-In this section we will configure the Java auto-instrumentation by modifying `Instrumentation` CR to:
-* create custom spans - for the main method of the application
-* capture server response HTTP headers
-
-See the [Java agent docs](https://opentelemetry.io/docs/languages/java/automatic/configuration/) with all the configuration options.
-
-See the [Instrumentation CR](./app/instrumentation-java-custom-config.yaml).
-
-```bash
-kubectl apply -f https://raw.githubusercontent.com/pavolloffay/kubecon-eu-2024-opentelemetry-kubernetes-tracing-tutorial/main/app/instrumentation-java-custom-config.yaml
-kubectl rollout restart deployment.apps/backend2-deployment -n tutorial-application
-kubectl get pods -w -n tutorial-application
-```
-
-![Span from backend2-deployment](./images/jaeger-capture-custom-headers.jpg)
 
 ---
 [Next steps](./04-manual-instrumentation.md)
