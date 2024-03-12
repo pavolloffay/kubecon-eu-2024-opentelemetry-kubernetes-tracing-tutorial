@@ -71,3 +71,5 @@ information Jaeger is able to query Prometheus and present a dashboard for each 
 showing the RED metrics for all of its traced operations.
 
 ![Jaeger Service Performance Monitoring](/images/jaeger-spm.png)
+
+[Next steps](./07-ottl.md)
