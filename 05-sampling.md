@@ -143,8 +143,28 @@ prometheus-77f88ccf7f-dfwh2               1/1     Running   0          100m
 
 ### Advanced Topic: Jaeger's Remote Sampling extension
  
-TODO:
-https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/main/extension/jaegerremotesampling/README.md
+This extension allows serving sampling strategies following the Jaeger's remote sampling API. This extension can be configured to proxy requests to a backing remote sampling server, which could potentially be a Jaeger Collector down the pipeline, or a static JSON file from the local file system.
+
+## Example Configuration
+
+```yaml
+extensions:
+  jaegerremotesampling:
+    source:
+      reload_interval: 30s
+      remote:
+        endpoint: jaeger-collector:14250
+  jaegerremotesampling/1:
+    source:
+      reload_interval: 1s
+      file: /etc/otelcol/sampling_strategies.json
+  jaegerremotesampling/2:
+    source:
+      reload_interval: 1s
+      file: http://jaeger.example.com/sampling_strategies.json
+```
+
+For more details, check the [offical documentation](https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/main/extension/jaegerremotesampling/README.md)
 
 
 [Next steps](./06-RED-metrics.md)
