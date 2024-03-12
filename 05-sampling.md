@@ -55,7 +55,7 @@ kubectl describe pod backend2-deployment-64ddcc76fd-w85zh -n tutorial-applicatio
 
 Tail sampling is where the decision to sample a trace takes place by considering all or most of the spans within the trace. Tail Sampling gives you the option to sample your traces based on specific criteria derived from different parts of a trace, which isn’t an option with Head Sampling.
 
-Update the ENV variables below in the backend2 deployment, which generates random spans with errors and latencies
+Update the ENV variables below in the backend2 deployment, which generates random spans with errors and high latencies.
 
 ```shell
 kubectl set env deployment backend2-deployment RATE_ERROR=50 RATE_HIGH_DELAY=50 -n tutorial-application 
