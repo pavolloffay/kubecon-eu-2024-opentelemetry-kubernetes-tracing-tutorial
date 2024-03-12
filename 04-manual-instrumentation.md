@@ -155,6 +155,8 @@ spec:
 +        image: ghcr.io/frzifus/kubecon-eu-2024-opentelemetry-kubernetes-tracing-tutorial-backend4:with-instr
 ```
 
+By instrumenting our applications, whether manually or automatically, we get more telemetry data to help us understand our system. However, since a large amount of telemetry data also generates costs, in the next chapter we will discuss how we can utilise this amount in a meaningful way. 
+
 ---
 
 [Next steps](./05-sampling.md)
