@@ -96,7 +96,7 @@ Now let's execute some requests on the app [http://localhost:4000/](http://local
 
 We should only see traces with errors and latencies exceeding 500ms.
 
-<TODO: Add screenshot>
+![OpenTelemetry Sampling](images/jaeger-tail-sampling.jpg)
 
 -----
 ### Advanced Topic: Sampling at scale with OpenTelemetry
