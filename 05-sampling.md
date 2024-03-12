@@ -34,14 +34,14 @@ https://github.com/pavolloffay/kubecon-eu-2024-opentelemetry-kubernetes-tracing-
 
 ```yaml
 kubectl apply -f https://raw.githubusercontent.com/pavolloffay/kubecon-eu-2024-opentelemetry-kubernetes-tracing-tutorial/main/app/instrumentation-head-sampling.yaml
-kubectl rollout restart deploy -n tutorial-application
+kubectl rollout restart deployment.apps/backend1-deployment -n tutorial-application
 kubectl get pods -w -n tutorial-application
 ```
 
-See the pod spec for one of the deployment:
+Describe the pod spec for the backend1 deployment to see the updated sampling rate.
 
 ```bash
-kubectl describe pod backend2-deployment-64ddcc76fd-w85zh -n tutorial-application
+kubectl describe pod backend1-deployment-64ddcc76fd-w85zh -n tutorial-application
 ```
 
 ```diff
