@@ -145,7 +145,7 @@ prometheus-77f88ccf7f-dfwh2               1/1     Running   0          100m
  
 This extension allows serving sampling strategies following the Jaeger's remote sampling API. This extension can be configured to proxy requests to a backing remote sampling server, which could potentially be a Jaeger Collector down the pipeline, or a static JSON file from the local file system.
 
-## Example Configuration
+#### Example Configuration
 
 ```yaml
 extensions:
