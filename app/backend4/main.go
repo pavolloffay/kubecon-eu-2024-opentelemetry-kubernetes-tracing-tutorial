@@ -13,6 +13,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/codes"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 	"go.opentelemetry.io/otel/trace"
@@ -119,6 +120,7 @@ func causeError(ctx context.Context, rate int) error {
 	if randomNumber < rate {
 		err := fmt.Errorf("internal server error")
 		span.RecordError(err)
+		span.SetStatus(codes.Error, "some error occured")
 		return err
 	}
 	return nil

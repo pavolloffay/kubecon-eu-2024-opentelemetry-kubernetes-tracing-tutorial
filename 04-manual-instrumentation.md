@@ -56,6 +56,10 @@ To simulate a more complex behaviour, we find a `causeError` function in the `/r
 
 Therefore we have to make sure that the context, which was previously created with the rootspan, is passed to this function. 
 
+### RecordError and set span status
+
+RecordError will record err as an exception span event for this span. An additional call to SetStatus is required if the Status of the Span should be set to Error, as this method does not change the Span status. If this span is not being recorded or err is nil then this method does nothing.
+
 ```diff
 func causeError(ctx context.Context, rate int) error {
 +	var span trace.Span
@@ -67,13 +71,20 @@ func causeError(ctx context.Context, rate int) error {
 	if randomNumber < rate {
 		err := fmt.Errorf("internal server error")
 +		span.RecordError(err)
++		span.SetStatus(codes.Error, "some error occured")
 		return err
 	}
 	return nil
 }
 ```
 
-In the same execution path we also find a function that ensures high delays of our `/rolldice` endpoint with a fixed probability. 
+In the same execution path we also find a function that ensures high delays of our `/rolldice` endpoint with a fixed probability.
+
+<TODO: Insert Image>
+
+### Add a custom Event
+
+AddEvent adds an event with the provided name and optionsAddEvent adds an event with the provided name and options.
 
 ```diff
 func causeDelay(ctx context.Context, rate int) {
@@ -87,6 +98,8 @@ func causeDelay(ctx context.Context, rate int) {
 	}
 }
 ```
+
+<TODO: Insert Image>
 
 Once the code has been instrumented, we can use `go mod tidy` to update the existing `go.mod` file and start testing our application.
 
