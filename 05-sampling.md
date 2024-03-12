@@ -100,6 +100,8 @@ We should only see traces with errors and latencies exceeding 500ms.
 
 -----
 ### Advanced Topic: Sampling at scale with OpenTelemetry
+> [!NOTE]  
+> This is an optional more advanced section.
 
 Requires two deployments of the Collector, the first layer routing all the spans of a trace to the same collector in the downstream deployment (using load-balancing exporter). And the second layer doing the tail sampling.
 
@@ -142,6 +144,8 @@ prometheus-77f88ccf7f-dfwh2               1/1     Running   0          100m
 ```
 
 ### Advanced Topic: Jaeger's Remote Sampling extension
+> [!NOTE]  
+> This is an optional more advanced section.
  
 This extension allows serving sampling strategies following the Jaeger's remote sampling API. This extension can be configured to proxy requests to a backing remote sampling server, which could potentially be a Jaeger Collector down the pipeline, or a static JSON file from the local file system.
 
