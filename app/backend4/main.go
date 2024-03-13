@@ -12,7 +12,9 @@ import (
 
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/codes"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
@@ -71,23 +73,24 @@ func main() {
 	}
 
 	mux := http.NewServeMux()
-	mux.HandleFunc("GET /rolldice", func(w http.ResponseWriter, r *http.Request) {
-		var span trace.Span
-		ctx, span := tracer.Start(r.Context(), "rolldice")
-		defer span.End()
+
+	const path = "GET /rolldice"
+	mux.Handle(path, otelhttp.NewMiddleware(path)(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		player := "Anonymous player"
 		if p := r.URL.Query().Get("player"); p != "" {
 			player = p
 		}
+
+		trace.SpanFromContext(r.Context()).AddEvent("determine player", trace.WithAttributes(attribute.String("player.name", player)))
 		max := 8
 		if fmt.Sprintf("%x", sha256.Sum256([]byte(player))) == "f4b7c19317c929d2a34297d6229defe5262fa556ef654b600fc98f02c6d87fdc" {
 			max = 8
 		} else {
 			max = 6
 		}
-		result := doRoll(ctx, max)
-		causeDelay(ctx, rateDelay)
-		if err := causeError(ctx, rateError); err != nil {
+		result := doRoll(r.Context(), max)
+		causeDelay(r.Context(), rateDelay)
+		if err := causeError(r.Context(), rateError); err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
@@ -98,7 +101,8 @@ func main() {
 			w.WriteHeader(http.StatusInternalServerError)
 		}
 
-	})
+	})))
+
 	mux.HandleFunc("GET /metrics", promhttp.Handler().ServeHTTP)
 	srv := &http.Server{
 		Addr:    "0.0.0.0:5165",
@@ -111,14 +115,13 @@ func main() {
 }
 
 func causeError(ctx context.Context, rate int) error {
-	var span trace.Span
-	_, span = tracer.Start(ctx, "causeError")
+	_, span := tracer.Start(ctx, "causeError")
 	defer span.End()
 
 	randomNumber := rand.Intn(100)
-	span.AddEvent(fmt.Sprintf("random nr: %d", randomNumber))
+	span.AddEvent("roll", trace.WithAttributes(attribute.Int("number", randomNumber)))
 	if randomNumber < rate {
-		err := fmt.Errorf("internal server error")
+		err := fmt.Errorf("number(%d)) < rate(%d)", randomNumber, rate)
 		span.RecordError(err)
 		span.SetStatus(codes.Error, "some error occured")
 		return err
@@ -127,11 +130,10 @@ func causeError(ctx context.Context, rate int) error {
 }
 
 func causeDelay(ctx context.Context, rate int) {
-	var span trace.Span
-	_, span = tracer.Start(ctx, "causeDelay")
+	_, span := tracer.Start(ctx, "causeDelay")
 	defer span.End()
 	randomNumber := rand.Intn(100)
-	span.AddEvent(fmt.Sprintf("random nr: %d", randomNumber))
+	span.AddEvent("roll", trace.WithAttributes(attribute.Int("number", randomNumber)))
 	if randomNumber < rate {
 		time.Sleep(time.Duration(2+rand.Intn(3)) * time.Second)
 	}
