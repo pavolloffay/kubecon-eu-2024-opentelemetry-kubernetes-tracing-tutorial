@@ -28,6 +28,8 @@ For more details, check the [offical documentation](https://opentelemetry.io/doc
 
 Head sampling is a sampling technique used to make a sampling decision as early as possible. A decision to sample or drop a span or trace is not made by inspecting the trace as a whole.
 
+For the list of all available samplers, check the [offical documentation](https://opentelemetry.io/docs/languages/sdk-configuration/general/#otel_traces_sampler)
+
 Update the sampling % in the Instrumentation CR and restart the deployment for the configurations to take effect.
 
 https://github.com/pavolloffay/kubecon-eu-2024-opentelemetry-kubernetes-tracing-tutorial/blob/d4b917c1cc4a411f59ae5dd770b22de1de9f6020/app/instrumentation-head-sampling.yaml#L13-L15
@@ -68,6 +70,7 @@ Deploy the opentelemetry collector with `tail_sampling` enabled.
 kubectl apply -f https://raw.githubusercontent.com/pavolloffay/kubecon-eu-2024-opentelemetry-kubernetes-tracing-tutorial/main/backend/05-collector-1.yaml
 kubectl get pods -n observability-backend -w
 ```
+For the list of all policies, check the [offical documentation](https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/main/processor/tailsamplingprocessor/README.md)
 
 ```yaml
   # Sample 100% of traces with ERROR-ing spans (omit traces with all OK spans)
