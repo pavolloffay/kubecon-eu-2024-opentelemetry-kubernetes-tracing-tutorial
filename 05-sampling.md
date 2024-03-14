@@ -4,9 +4,9 @@ This tutorial step covers the basic usage of the OpenTelemetry Collector on Kube
 
 ## Overview
 
-![tracing setup](images/tracing-setup.png)
+In chapter 3 we saw the [schematic structure of the dice game application](https://github.com/pavolloffay/kubecon-eu-2024-opentelemetry-kubernetes-tracing-tutorial/blob/main/03-auto-instrumentation.md#application-description). The following diagram illustrates how the telemetry data collected there is exported and stored. [excalidraw](https://excalidraw.com/#json=15BrdSOMEkc9RA5cxeqwz,urTmfk01mbx7V-PpQI7KgA)
 
-[excalidraw](https://excalidraw.com/#json=15BrdSOMEkc9RA5cxeqwz,urTmfk01mbx7V-PpQI7KgA)
+![tracing setup](images/tracing-setup.png)
 
 ## Sampling, what does it mean and why is it important?
 

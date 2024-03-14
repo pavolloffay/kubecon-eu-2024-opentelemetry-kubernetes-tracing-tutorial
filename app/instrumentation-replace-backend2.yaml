@@ -32,7 +32,7 @@ spec:
         - name: RATE_HIGH_DELAY
           value: 20
         # NOTE: alternative to instrumentation annotation
-        # - name: OTEL_EXPORTER_OTLP_ENDPOINT
-        #   value: http://otel-collector.observability-backend.svc.cluster.local:4317
-        # - name: OTEL_SERVICE_NAME
-        #   value: go-backend
+        - name: OTEL_EXPORTER_OTLP_ENDPOINT
+          value: http://otel-collector.observability-backend.svc.cluster.local:4317
+        - name: OTEL_SERVICE_NAME
+          value: go-backend

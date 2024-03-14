@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
@@ -74,8 +75,12 @@ func main() {
 
 	mux := http.NewServeMux()
 
-	const path = "GET /rolldice"
-	mux.Handle(path, otelhttp.NewMiddleware(path)(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	registerHandleFunc := func(pattern string, h http.HandlerFunc) {
+		route := strings.Split(pattern, " ")
+		mux.Handle(pattern, otelhttp.NewHandler(otelhttp.WithRouteTag(route[len(route)-1], h), pattern))
+	}
+
+	registerHandleFunc("GET /rolldice", func(w http.ResponseWriter, r *http.Request) {
 		player := "Anonymous player"
 		if p := r.URL.Query().Get("player"); p != "" {
 			player = p
@@ -101,9 +106,9 @@ func main() {
 			w.WriteHeader(http.StatusInternalServerError)
 		}
 
-	})))
+	})
 
-	mux.HandleFunc("GET /metrics", promhttp.Handler().ServeHTTP)
+	registerHandleFunc("GET /metrics", promhttp.Handler().ServeHTTP)
 	srv := &http.Server{
 		Addr:    "0.0.0.0:5165",
 		Handler: mux,
