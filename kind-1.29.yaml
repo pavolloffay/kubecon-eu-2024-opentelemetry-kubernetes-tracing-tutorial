@@ -1,0 +1,45 @@
+---
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+featureGates:
+  APIServerTracing: true
+nodes:
+  - role: control-plane
+    image: kindest/node:v1.29.1@sha256:a0cc28af37cf39b019e2b448c54d1a3f789de32536cb5a5db61a49623e527144
+    extraMounts:
+     - hostPath: ./app/api-server/
+       containerPath: /api-server
+       readOnly: true
+       selinuxRelabel: true
+    kubeadmConfigPatches:
+      - |
+        kind: KubeletConfiguration
+        featureGates:
+          KubeletTracing: true
+        tracing:
+          samplingRatePerMillion: 1000000
+          endpoint: "127.0.0.1:4317"
+      - |
+        kind: ClusterConfiguration
+        etcd:
+          local:
+            # NOTE: https://github.com/etcd-io/etcd/pull/16951
+            imageRepository: "quay.io/coreos"
+            imageTag: "v3.5.11"
+            extraArgs:
+              experimental-enable-distributed-tracing: "true"
+              # NOTE: Default: localhost:4317, we avoid IPv6
+              experimental-distributed-tracing-address: 127.0.0.1:4317
+              experimental-distributed-tracing-service-name: "etcd"
+              experimental-distributed-tracing-instance-id: "caf201fd-8d5b-467b-a70f-09ad3beb5a21"
+              # NOTE: Only availabile in etcd 3.5.11 or higher
+              experimental-distributed-tracing-sampling-rate: "1000000"
+        apiServer:
+          extraArgs:
+            tracing-config-file: "/api-server/tracing-config.yaml"
+          extraVolumes:
+          - name: tracingConfig
+            hostPath: /api-server/tracing-config.yaml
+            mountPath: /api-server/tracing-config.yaml
+            readOnly: true
+            pathType: "File"

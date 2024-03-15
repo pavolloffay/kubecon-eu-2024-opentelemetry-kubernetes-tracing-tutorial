@@ -1,0 +1,28 @@
+apiVersion: opentelemetry.io/v1alpha1
+kind: OpenTelemetryCollector
+metadata:
+  name: system-tracing
+  namespace: kube-system
+spec:
+  mode: daemonset
+  hostNetwork: true
+  config: |
+    receivers:
+      otlp:
+        protocols:
+          grpc:
+            endpoint: 0.0.0.0:4317
+    processors:
+
+    exporters:
+      otlp:
+        endpoint: "otel-collector.observability-backend.svc.cluster.local:4317"
+        tls:
+          insecure: true
+    service:
+      pipelines:
+        traces:
+          receivers: [otlp]
+          processors: []
+          exporters: [otlp]
+

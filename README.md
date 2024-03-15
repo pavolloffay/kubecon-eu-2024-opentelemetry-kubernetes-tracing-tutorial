@@ -23,8 +23,9 @@ Each tutorial step is located in a separate file:
 1. [Welcome & Setup](01-welcome-setup.md) (Pavol, 5 min)
 1. [OpenTelemetry distributed tracing introduction](02-tracing-introduction.md) (Matej, 10 min)
 1. [Auto-instrumentation](03-auto-instrumentation.md) (Pavol, 25 min)
-1. [Manual-instrumentation](04-manual-instrumentation.md) (Bene & Matej, 10 min)
+1. [Manual-instrumentation](04-manual-instrumentation.md) (Bene, 10 min)
 1. [Sampling](05-sampling.md) (Bene & Anu, 15 min)
 1. [Metrics from Traces](06-RED-metrics.md) (Anthony, 10 min)
 1. [OpenTelemetry Transformation Language and Spans](07-ottl.md) (Matej, 10 min)
 1. Wrap up & Questions
+1. [K8S-Tracing](08-k8s-tracing.md) (Bene, optional)
