@@ -28,11 +28,11 @@ spec:
         - containerPort: 5165
         env:
         - name: RATE_ERROR
-          value: 20
+          value: "20"
         - name: RATE_HIGH_DELAY
-          value: 20
+          value: "20"
         # NOTE: alternative to instrumentation annotation
         - name: OTEL_EXPORTER_OTLP_ENDPOINT
-          value: http://otel-collector.observability-backend.svc.cluster.local:4317
+          value: "http://otel-collector.observability-backend.svc.cluster.local:4317"
         - name: OTEL_SERVICE_NAME
-          value: go-backend
+          value: "go-backend"
