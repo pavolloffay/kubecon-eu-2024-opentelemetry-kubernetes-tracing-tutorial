@@ -2,7 +2,7 @@
 
 This tutorial section covers the manual instrumentation of a go application with the opentelemetry-sdk.
 
-As a basis for the instrumentation we use [backend4](./app/backend4/main.go). To compile the application you need [go 1.22 or newer](https://go.dev/doc/install).
+As a basis for the instrumentation we use [backend4-uninstrumented](./app/backend4-no-instrumentation/main.go) ([backend4-instrumented](./app/backend4/main.go)). To compile the application you need [go 1.22 or newer](https://go.dev/doc/install).
 
 # Initialize OpenTelemetry-go-sdk
 
@@ -132,7 +132,7 @@ spec:
       containers:
       - name: backend2
 -        image: ghcr.io/pavolloffay/kubecon-eu-2024-opentelemetry-kubernetes-tracing-tutorial-backend2:latest
-+        image: ghcr.io/frzifus/kubecon-eu-2024-opentelemetry-kubernetes-tracing-tutorial-backend4:with-instr
++        image: ghcr.io/pavolloffay/kubecon-eu-2024-opentelemetry-kubernetes-tracing-tutorial-backend4:latest
         env:
 +        - name: RATE_ERROR
 +          value: 20

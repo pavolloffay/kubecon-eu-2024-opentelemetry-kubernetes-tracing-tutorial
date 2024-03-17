@@ -12,7 +12,29 @@ In chapter 3 we saw the [schematic structure of the dice game application](https
 
 Sampling refers to the practice of selectively capturing and recording traces of requests flowing through a distributed system, rather than capturing every single request. It is crucial in distributed tracing systems because modern distributed applications often generate a massive volume of requests and transactions, which can overwhelm the tracing infrastructure or lead to excessive storage costs if every request is traced in detail.
 
-For example, a medium sized setup producing ~1M traces per minute can result in a cost of approximately $250,000 per month. (Note that this depends on your infrastructure costs, the SaaS provider you choose, the amount of metadata, etc.)
+For example, a medium sized setup producing ~1M traces per minute can result in a cost of approximately $250,000 per month. (Note that this depends on your infrastructure costs, the SaaS provider you choose, the amount of metadata, etc.) You may want to check some service costs to get a better idea.
+
+Pricing:
+- AWS Xray ([calculator](https://aws.amazon.com/xray/pricing/))
+- GCP Cloud Trace [pricing](https://cloud.google.com/stackdriver/pricing#trace-costs)
+
+```
+GCP
+
+Feature           Price                 Free allotment per month  Effective date
+Trace ingestion   $0.20/million spans   First 2.5 million spans   November 1, 2018 
+---
+
+X-Ray Tracing
+
+Traces recorded cost $5.00 per 1 million traces recorded ($0.000005 per trace).
+
+Traces retrieved cost $0.50 per 1 million traces retrieved ($0.0000005 per trace).
+
+Traces scanned cost $0.50 per 1 million traces scanned ($0.0000005 per trace).
+
+X-Ray Insights traces stored costs $1.00 per million traces recorded ($0.000001 per trace).
+```
 
 For more details, check the [offical documentation](https://opentelemetry.io/docs/concepts/sampling/).
 
