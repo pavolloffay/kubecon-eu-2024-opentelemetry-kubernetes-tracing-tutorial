@@ -21,9 +21,7 @@ spec:
     spec:
       containers:
       - name: backend2
-        # TODO: switch to ghcr.io/pavolloffay
-        # https://github.com/users/frzifus/packages/container/package/kubecon-eu-2024-opentelemetry-kubernetes-tracing-tutorial-backend4
-        image: ghcr.io/frzifus/kubecon-eu-2024-opentelemetry-kubernetes-tracing-tutorial-backend4:with-instr
+        image: ghcr.io/pavolloffay/kubecon-eu-2024-opentelemetry-kubernetes-tracing-tutorial-backend4:latest
         ports:
         - containerPort: 5165
         env:
