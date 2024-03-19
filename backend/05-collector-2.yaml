@@ -83,8 +83,6 @@ spec:
             endpoint: 0.0.0.0:4318
     
     processors:   
-      # Sample 100% of traces with ERROR-ing spans (omit traces with all OK spans)
-      # and traces which have a duration longer than 500ms
       tail_sampling:
         decision_wait: 10s # time to wait before making a sampling decision is made
         num_traces: 100 # number of traces to be kept in memory
@@ -96,6 +94,9 @@ spec:
           - name: keep-slow-traces
             type: latency
             latency: {threshold_ms: 500}
+          - name: randomized-policy
+            type: probabilistic
+            probabilistic: {sampling_percentage: 10}  
 
     exporters:
       otlp/traces:
