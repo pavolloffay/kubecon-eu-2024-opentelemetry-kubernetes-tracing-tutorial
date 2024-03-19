@@ -124,20 +124,27 @@ Now, let’s walk-through the tail-sampling processor configuration, placed in t
         ]
 ```
 
-For the list of all policies, check the [offical documentation](https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/main/processor/tailsamplingprocessor/README.md)
-
 Now let's execute some requests on the app [http://localhost:4000/](http://localhost:4000/) and see traces in the Jaeger console [http://localhost:16686/](http://localhost:16686/).
 
-We should only see traces with errors and latencies exceeding 500ms.
+The image next is an example of what you might see in your backend with this sample configuration. With this configuration, you’ll get all traces with errors and latencies exceeding 500ms, as well as a random sampling of other traces based on the rate we’ve configured.
 
 ![OpenTelemetry Sampling](images/jaeger-tail-sampling.jpg)
+
+You also have the flexibility to add other policies. For the list of all policies, check the [offical documentation](https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/main/processor/tailsamplingprocessor/README.md)
+
+Here are a few examples:
+
+- `always_sample`: Sample all traces.
+- `string_attribute`: Sample based on string attribute values, both exact and
+  regular expression value matches are supported. For example, you could sample
+  based on specific custom attribute values.
 
 -----
 ### Advanced Topic: Sampling at scale with OpenTelemetry
 > [!NOTE]  
 > This is an optional more advanced section.
 
-Requires two deployments of the Collector, the first layer routing all the spans of a trace to the same collector in the downstream deployment (using load-balancing exporter). And the second layer doing the tail sampling.
+All spans of a trace must be processed by the same collector for tail sampling to function properly, posing scalability challenges. Initially, a single collector may suffice, but as the system grows, a two-layer setup becomes necessary. It requires two deployments of the collector, with the first layer routing all spans of a trace to the same collector in the downstream deployment (using a [load-balancing exporter](https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/main/exporter/loadbalancingexporter/README.md)), and the second layer performing the tail sampling.
 
 ![OpenTelemetry Sampling](images/scaling-otel-collector.jpg)
 
