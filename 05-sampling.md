@@ -101,7 +101,7 @@ Now, let’s walk-through the tail-sampling processor configuration, placed in t
   # 3. Randomized sampling of 10% of traces without errors and latencies.
   processors: 
     tail_sampling:
-      decision_wait: 10s # time to wait before making a sampling decision is made
+      decision_wait: 10s # time to wait before making a sampling decision
       num_traces: 100 # number of traces to be kept in memory
       expected_new_traces_per_sec: 10 # expected rate of new traces per second
       policies:
