@@ -92,7 +92,8 @@ Deploy the opentelemetry collector with `tail_sampling` enabled.
 kubectl apply -f https://raw.githubusercontent.com/pavolloffay/kubecon-eu-2024-opentelemetry-kubernetes-tracing-tutorial/main/backend/05-collector-1.yaml
 kubectl get pods -n observability-backend -w
 ```
-For the list of all policies, check the [offical documentation](https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/main/processor/tailsamplingprocessor/README.md)
+
+Now, let’s walk-through the tail-sampling processor configuration, placed in the `processors` section of the collector configuration file:
 
 ```yaml
   # 1. Sample 100% of traces with ERROR-ing spans
@@ -122,6 +123,8 @@ For the list of all policies, check the [offical documentation](https://github.c
             }
         ]
 ```
+
+For the list of all policies, check the [offical documentation](https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/main/processor/tailsamplingprocessor/README.md)
 
 Now let's execute some requests on the app [http://localhost:4000/](http://localhost:4000/) and see traces in the Jaeger console [http://localhost:16686/](http://localhost:16686/).
 
