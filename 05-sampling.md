@@ -159,12 +159,14 @@ kubectl get pods -n observability-backend -w
 
 ```bash
 jaeger-bc5f49d78-627ct                    1/1     Running   0          100m
-otel-collector-6cc77b975c-plqth           1/1     Running   0          15m
-otel-gateway-collector-6bfbc5f68b-98wx5   1/1     Running   0          6m40s
-otel-gateway-collector-6bfbc5f68b-hrrcq   1/1     Running   0          6m40s
+otel-collector-b48b5d66d-k5dsc            1/1     Running   0          4m42s
+otel-gateway-collector-0                  1/1     Running   0          3m38s
+otel-gateway-collector-1                  1/1     Running   0          3m38s
 prometheus-77f88ccf7f-dfwh2               1/1     Running   0          100m
 
 ```
+
+Now, let’s walk-through the load-balancing exporter configuration, placed in the `exporters` section of the collector (layer 1) configuration file:
 
 ```yaml
   exporters:
