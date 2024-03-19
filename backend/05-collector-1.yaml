@@ -34,7 +34,7 @@ spec:
             latency: {threshold_ms: 500}
           - name: randomized-policy
             type: probabilistic
-            latency: {sampling_percentage: 10}            
+            probabilistic: {sampling_percentage: 10}            
 
     exporters:
       otlp/traces:
