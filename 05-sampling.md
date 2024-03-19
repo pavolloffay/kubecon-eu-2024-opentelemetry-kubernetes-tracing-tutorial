@@ -114,12 +114,12 @@ For the list of all policies, check the [offical documentation](https://github.c
               name: keep-slow-traces,
               type: latency,
               latency: {threshold_ms: 500}
-            }
+            },
             {
               name: randomized-policy,
               type: probabilistic,
               probabilistic: {sampling_percentage: 10}
-            },
+            }
         ]
 ```
 
