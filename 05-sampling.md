@@ -95,8 +95,9 @@ kubectl get pods -n observability-backend -w
 For the list of all policies, check the [offical documentation](https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/main/processor/tailsamplingprocessor/README.md)
 
 ```yaml
-  # Sample 100% of traces with ERROR-ing spans (omit traces with all OK spans)
-  # and traces which have a duration longer than 500ms
+  # 1. Sample 100% of traces with ERROR-ing spans
+  # 2. Sample 100% of trace which have a duration longer than 500ms
+  # 3. Randomized sampling of 10% of traces without errors and latencies.
   processors: 
     tail_sampling:
       decision_wait: 10s # time to wait before making a sampling decision is made
@@ -114,6 +115,11 @@ For the list of all policies, check the [offical documentation](https://github.c
               type: latency,
               latency: {threshold_ms: 500}
             }
+            {
+              name: randomized-policy,
+              type: probabilistic,
+              probabilistic: {sampling_percentage: 10}
+            },
         ]
 ```
 
