@@ -44,6 +44,7 @@ kubectl apply -f https://raw.githubusercontent.com/pavolloffay/kubecon-eu-2024-o
 Once this change is applied we can query Prometheus for the `calls_total` metrics and observe the metrics generated from our trace data:
 
 ![Prometheus Span Metrics](images/prometheus_spanmetrics.png)
+[Link](http://localhost:8080/graph?g0.expr=calls_total&g0.tab=0&g0.stacked=0&g0.show_exemplars=0&g0.range_input=1h)
 
 ## Jaeger Configuration
 
@@ -71,5 +72,6 @@ information Jaeger is able to query Prometheus and present a dashboard for each 
 showing the RED metrics for all of its traced operations.
 
 ![Jaeger Service Performance Monitoring](/images/jaeger-spm.png)
+[Link](http://localhost:16686/monitor)
 
 [Next steps](./07-ottl.md)
