@@ -33,7 +33,7 @@ If this is not the case, simply download the [kind-v0.22.0](https://github.com/k
 After a successful installation, a cluster can be created as follows:
 
 ```bash
-kind create cluster --name=workshop --image kindest/node:v1.27.3
+kind create cluster --name=workshop --config=kind-1.29.yaml
 ```
 
 Kind automatically sets the kube context to the created workshop cluster. We can easily check this by getting information about our nodes.
@@ -45,7 +45,7 @@ Expected is the following:
 
 ```bash
 NAME                     STATUS   ROLES           AGE   VERSION
-workshop-control-plane   Ready    control-plane   75s   v1.27.3
+workshop-control-plane   Ready    control-plane   75s   v1.29.1
 ```
 
 ### Cleanup

@@ -38,7 +38,7 @@ nodes:
           extraArgs:
             tracing-config-file: "/api-server/tracing-config.yaml"
           extraVolumes:
-          - name: tracingConfig
+          - name: tracing-config
             hostPath: /api-server/tracing-config.yaml
             mountPath: /api-server/tracing-config.yaml
             readOnly: true

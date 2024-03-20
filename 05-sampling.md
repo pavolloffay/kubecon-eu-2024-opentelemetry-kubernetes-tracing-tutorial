@@ -16,7 +16,7 @@ For example, a medium sized setup producing ~1M traces per minute can result in 
 
 Pricing:
 - AWS Xray ([calculator](https://aws.amazon.com/xray/pricing/))
-- GCP Cloud Trace [pricing](https://cloud.google.com/stackdriver/pricing#trace-costs)
+- GCP Cloud Trace ([pricing](https://cloud.google.com/stackdriver/pricing#trace-costs))
 
 ```
 GCP

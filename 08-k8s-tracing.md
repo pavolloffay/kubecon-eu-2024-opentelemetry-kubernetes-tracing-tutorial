@@ -88,6 +88,20 @@ spec:
   priorityClassName: system-node-critical
 ```
 
+Once the API-Server and ETCD are reporting telemetry data we can make some noise by creating and deleting an nginx instance:
+```bash
+$ kubectl create deployment nginx-project --image=nginx
+deployment.apps/nginx-project created
+---
+$ kubectl get deployments.apps
+NAME            READY   UP-TO-DATE   AVAILABLE   AGE
+nginx-project   1/1     1            1           1m
+---
+$ kubectl delete deployments.apps nginx-project
+deployment.apps "nginx-project" deleted
+```
+
+![api-server](images/api-server.png)
 
 ## Kubelet
 
@@ -112,3 +126,6 @@ This should be the effect:
     volumeStatsAggPeriod: 0s
 ```
 
+
+![terminating](images/terminating.png)
+![terminated](images/terminated.png)
