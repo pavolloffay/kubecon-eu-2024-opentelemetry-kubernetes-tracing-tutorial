@@ -126,7 +126,7 @@ Now, let’s walk-through the tail-sampling processor configuration, placed in t
 
 Now let's execute some requests on the app [http://localhost:4000/](http://localhost:4000/) and see traces in the Jaeger console [http://localhost:16686/](http://localhost:16686/).
 
-The image next is an example of what you might see in your backend with this sample configuration. With this configuration, you’ll get all traces with errors and latencies exceeding 500ms, as well as a random sampling of other traces based on the rate we’ve configured.
+The image next is an example of what you might see in your backend with this sample configuration. With this configuration, you’ll get all traces with errors and latencies exceeding 500ms, as well as a random sample of other traces based on the rate we’ve configured.
 
 ![OpenTelemetry Sampling](images/jaeger-tail-sampling.jpg)
 
