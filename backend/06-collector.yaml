@@ -20,24 +20,21 @@ spec:
           http:
             endpoint: 0.0.0.0:4318
     
-    processors: 
+    processors:
       tail_sampling:
-        decision_wait: 10s # time to wait before making a sampling decision is made
+        decision_wait: 10s # time to wait before making a sampling decision
         num_traces: 100 # number of traces to be kept in memory
         expected_new_traces_per_sec: 10 # expected rate of new traces per second
         policies:
-          [          
-            {
-              name: keep-errors,
-              type: status_code,
-              status_code: {status_codes: [ERROR]}
-            },
-            {
-              name: keep-slow-traces,
-              type: latency,
-              latency: {threshold_ms: 500}
-            }
-          ]
+          - name: keep-errors
+            type: status_code
+            status_code: {status_codes: [ERROR]}
+          - name: keep-slow-traces
+            type: latency
+            latency: {threshold_ms: 500}
+          - name: randomized-policy
+            type: probabilistic
+            probabilistic: {sampling_percentage: 10}
 
     exporters:
       otlp/traces:
