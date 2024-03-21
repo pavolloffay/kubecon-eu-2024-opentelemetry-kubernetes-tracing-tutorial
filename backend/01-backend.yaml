@@ -351,7 +351,7 @@ spec:
               value: "false"
             - name: COLLECTOR_OTLP_ENABLED
               value: "true"
-          image: jaegertracing/all-in-one:1.54.0
+          image: ghcr.io/matej-g/all-in-one:1.54
           livenessProbe:
             failureThreshold: 5
             httpGet:
