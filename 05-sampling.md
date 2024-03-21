@@ -46,13 +46,15 @@ For more details, check the [offical documentation](https://opentelemetry.io/doc
 
 ![OpenTelemetry Sampling](images/sampling-comparision.jpg)
 
-### Head based sampling
+### How to implement head sampling with OpenTelemetry
 
 Head sampling is a sampling technique used to make a sampling decision as early as possible. A decision to sample or drop a span or trace is not made by inspecting the trace as a whole.
 
 For the list of all available samplers, check the [offical documentation](https://opentelemetry.io/docs/languages/sdk-configuration/general/#otel_traces_sampler)
 
-Update the sampling % in the Instrumentation CR and restart the deployment for the configurations to take effect.
+#### Auto Instrumentation
+
+Update the sampling % in the Auto Instrumentation CR and restart the deployment for the configurations to take effect.
 
 https://github.com/pavolloffay/kubecon-eu-2024-opentelemetry-kubernetes-tracing-tutorial/blob/d4b917c1cc4a411f59ae5dd770b22de1de9f6020/app/instrumentation-head-sampling.yaml#L13-L15
 
@@ -75,7 +77,20 @@ kubectl describe pod backend1-deployment-64ddcc76fd-w85zh -n tutorial-applicatio
 +         OTEL_TRACES_SAMPLER_ARG:             0.5
 ```
 
-### Tailbased Sampling
+This tells the SDK to sample spans such that only 50% of traces get created.
+
+#### Manual Instrumentation 
+
+You can also configure the ParentBasedTraceIdRatioSampler in code.A [`Sampler`](https://pkg.go.dev/go.opentelemetry.io/otel/sdk/trace#Sampler) can be set on the tracer provider using the [`WithSampler`](https://pkg.go.dev/go.opentelemetry.io/otel/sdk/trace#WithSampler)
+option, as follows:
+
+```go
+provider := trace.NewTracerProvider(
+    trace.WithSampler(trace.NewParentBasedTraceIdRatioSampler(0.5)),
+)
+```
+
+### How to implement tail sampling in the OpenTelemetry Collector
 
 Tail sampling is where the decision to sample a trace takes place by considering all or most of the spans within the trace. Tail Sampling gives you the option to sample your traces based on specific criteria derived from different parts of a trace, which isn’t an option with Head Sampling.
 
@@ -140,7 +155,7 @@ Here are a few examples:
   based on specific custom attribute values.
 
 -----
-### Advanced Topic: Sampling at scale with OpenTelemetry
+### Advanced Topic: Tail Sampling at scale with OpenTelemetry
 > [!NOTE]  
 > This is an optional more advanced section.
 
