@@ -30,7 +30,17 @@ Let's take a look at how OTTL can look in action with tracing. OTTL can be lever
 
 Our application supports recording the names of the players who are rolling the dice, by passing the names of the players as parameters in the URL, e.g. `?player1=John&player2=Jane`. Due to privacy concerns, we might not want to include these names as attributes on our spans and we would rather anonymize them. To do this, we will always pick only the first letter of the player's name and include it as the attribute.
 
-First, take a look at Jaeger and see that our spans have the `app.player1` and `app.player2` attributes. Choose the `frontend-deployment` service and observe that the root span has attributes `app.player1` and `app.player2` with the full names of the players.
+Let's fire a couple of frontend requests with player names. In case you stopped your port forwarding, start it again for both the frontend and our Jaeger instance:
+```bash
+kubectl port-forward service/frontend-service -n tutorial-application 4000:4000 &
+kubectl port-forward -n observability-backend service/jaeger-query 16686:16686 &
+```
+Now let's make couple of requests with player names:
+- http://localhost:4000/?player1=John_Doe&player2=Jane_Doe
+- http://localhost:4000/?player1=Neo&player2=Trinity
+- http://localhost:4000/?player1=Barbie&player2=Ken
+
+First, take a look at the [Jaeger UI](http://localhost:16686/) and see that our spans have the `app.player1` attribute. Choose the `frontend-deployment` service and observe that the root span has attribute `app.player1` with the full name of the player.
 
 Second, inspect the configuration for our `transformprocessor` below:
 
@@ -75,4 +85,4 @@ After the collector with the new configuration rolls out, run a couple of reques
 - http://localhost:4000/?player1=Neo&player2=Trinity
 - http://localhost:4000/?player1=Barbie&player2=Ken
 
-Now open your [Jaeger UI](http://localhost:16686/) and observe the spans. You should see that the `app.player1` and `app.player2` attributes are now anonymized and the player names are now replaced with `{playerName}` in attributes that contain the URL. You have successfully transformed your spans with OTTL!
+Now open your [Jaeger UI](http://localhost:16686/) again and observe the spans. You should see that the `app.player1` attributes is now anonymized and the player names are now replaced with `{playerName}` in attributes that contain the URL. You have successfully transformed your spans with OTTL!
