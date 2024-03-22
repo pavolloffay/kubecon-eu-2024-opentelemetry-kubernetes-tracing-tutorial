@@ -10,9 +10,9 @@ __Abstract__: Rolling out an observability solution is not a straightforward pro
 
 __Schedule__: https://sched.co/1YePA
 
-__Slides__: https://docs.google.com/presentation/d/1IdQgrDKp4cP6fJ_IHlv1QszRMGL_uquW/edit#slide=id.p2
+__Slides__: [intro-slides](./intro-slides.pdf)
 
-__Recording__: 
+__Recording__: https://www.youtube.com/watch?v=nwy0I6vdtEE
 
 ## Agenda
 
