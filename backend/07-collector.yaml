@@ -29,8 +29,8 @@ spec:
             statements:
                 - set(attributes["app.player1"], Substring(attributes["app.player1"], 0, 1)) where attributes["app.player1"] != ""
                 - set(attributes["app.player2"], Substring(attributes["app.player2"], 0, 1)) where attributes["app.player2"] != ""
-                - replace_all_patterns(attributes, "value", "player1=[a-zA-Z]*", "player1={playerName}")
-                - replace_all_patterns(attributes, "value", "player2=[a-zA-Z]*", "player2={playerName}")
+                - replace_all_patterns(attributes, "value", "player1=[a-zA-Z_]*", "player1={playerName}")
+                - replace_all_patterns(attributes, "value", "player2=[a-zA-Z_]*", "player2={playerName}")
 
     exporters:
       otlp/traces:
