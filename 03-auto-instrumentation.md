@@ -269,6 +269,10 @@ Open Prometheus in the browser [localhost:8080](http://localhost:8080/graph?g0.e
 
 ![Metrics from Java agent from backend2-deployment](./images/prometheus_javaagent_metrics_list.jpg)
 
+Open Prometheus in the browser [localhost:8080](http://localhost:8080/graph?g0.expr=http_server_duration_milliseconds_bucket%7Bhttp_status_code%3D%22200%22%7D%0A&g0.tab=0&g0.stacked=0&g0.show_exemplars=0&g0.range_input=1h)
+
+![Server RED Metrics from Java agent](./images/prometheus_javaagent_red_metrics.jpg)
+
 ### Customize Java auto-instrumentation with config (capture more data)
 
 In this section we will configure the Java auto-instrumentation by modifying `Instrumentation` CR to:
