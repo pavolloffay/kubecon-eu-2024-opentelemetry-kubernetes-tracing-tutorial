@@ -33,7 +33,7 @@ public class RollController {
 			logger.info("Anonymous player is rolling the dice: " + result);
 		}
 		Span span = Span.current();
-        span.setAttribute("result", result);
+        span.setAttribute("result", Integer.toString(result));
         span.setAttribute("player", player.orElse("Anonymous"));
 		return Integer.toString(result);
 	}
