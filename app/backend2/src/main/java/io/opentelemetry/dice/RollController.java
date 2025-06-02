@@ -9,10 +9,10 @@ import org.apache.logging.log4j.Logger;
 
 import java.util.Optional;
 
-// import io.opentelemetry.api.trace.Span;
-// import io.opentelemetry.instrumentation.annotations.WithSpan;
-// import io.opentelemetry.instrumentation.annotations.SpanAttribute;
-// import io.opentelemetry.instrumentation.annotations.AddingSpanAttributes;
+import io.opentelemetry.api.trace.Span;
+import io.opentelemetry.instrumentation.annotations.WithSpan;
+import io.opentelemetry.instrumentation.annotations.SpanAttribute;
+import io.opentelemetry.instrumentation.annotations.AddingSpanAttributes;
 
 @RestController
 public class RollController {
@@ -32,6 +32,9 @@ public class RollController {
 		} else {
 			logger.info("Anonymous player is rolling the dice: " + result);
 		}
+		Span span = Span.current();
+        span.setAttribute("result", result);
+        span.setAttribute("player", player.orElse("Anonymous"));
 		return Integer.toString(result);
 	}
 
